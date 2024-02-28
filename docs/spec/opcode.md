@@ -1,0 +1,272 @@
+- 0x
+  - x0: NOP (1)
+  - x1
+  - x2
+  - x3
+  - x4
+  - x5
+  - x6
+  - x7
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF
+- 1x
+  - x0
+  - x1
+  - x2
+  - x3
+  - x4
+  - x5
+  - x6
+  - x7
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF 
+- 2x
+  - x0
+  - x1
+  - x2
+  - x3
+  - x4
+  - x5
+  - x6
+  - x7
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF 
+- 3x
+  - x0
+  - x1
+  - x2
+  - x3
+  - x4
+  - x5
+  - x6
+  - x7
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE: LD A, d8 (2)
+  - xF
+- 4x
+  - x0: LD B, B (1)
+  - x1: LD B, C (1)
+  - x2: LD B, D (1)
+  - x3: LD B, E (1)
+  - x4: LD B, H (1)
+  - x5: LD B, L (1)
+  - x6: LD B, (HL) (1)
+  - x7: LD B, A (1)
+  - x8: LD C, B (1)
+  - x9: LD C, C (1)
+  - xA: LD C, D (1)
+  - xB: LD C, E (1)
+  - xC: LD C, H (1)
+  - xD: LD C, L (1)
+  - xE: LD C, (HL) (1)
+  - xF: LD C, A (1)
+- 5x
+  - x0: LD D, B (1)
+  - x1: LD D, C (1)
+  - x2: LD D, D (1)
+  - x3: LD D, E (1)
+  - x4: LD D, H (1)
+  - x5: LD D, L (1)
+  - x6: LD D, (HL) (1)
+  - x7: LD D, A (1)
+  - x8: LD E, B (1)
+  - x9: LD E, C (1)
+  - xA: LD E, D (1)
+  - xB: LD E, E (1)
+  - xC: LD E, H (1)
+  - xD: LD E, L (1)
+  - xE: LD E, (HL) (1)
+  - xF: LD E, A (1)
+- 6x
+  - x0: LD H, B (1)
+  - x1: LD H, C (1)
+  - x2: LD H, D (1)
+  - x3: LD H, E (1)
+  - x4: LD H, H (1)
+  - x5: LD H, L (1)
+  - x6: LD H, (HL) (1)
+  - x7: LD H, A (1)
+  - x8: LD L, B (1)
+  - x9: LD L, C (1)
+  - xA: LD L, D (1)
+  - xB: LD L, E (1)
+  - xC: LD L, H (1)
+  - xD: LD L, L (1)
+  - xE: LD L, (HL) (1)
+  - xF: LD L, A (1)
+- 7x
+  - x0: LD (HL), B (1)
+  - x1: LD (HL), C (1)
+  - x2: LD (HL), D (1)
+  - x3: LD (HL), E (1)
+  - x4: LD (HL), H (1)
+  - x5: LD (HL), L (1)
+  - x6: HALT (1)
+  - x7: LD (HL), A (1)
+  - x8: LD A, B (1)
+  - x9: LD A, C (1)
+  - xA: LD A, D (1)
+  - xB: LD A, E (1)
+  - xC: LD A, H (1)
+  - xD: LD A, L (1)
+  - xE: LD A, (HL) (1)
+  - xF: LD A, A (1)
+- 8x
+  - x0: ADD A, B (1)
+  - x1: ADD A, C (1)
+  - x2: ADD A, D (1)
+  - x3: ADD A, E (1)
+  - x4: ADD A, H (1)
+  - x5: ADD A, L (1)
+  - x6: ADD A, (HL) (1)
+  - x7: ADD A, A (1)
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF
+- 9x
+  - x0: SUB B (1)
+  - x1: SUB C (1)
+  - x2: SUB D (1)
+  - x3: SUB E (1)
+  - x4: SUB H (1)
+  - x5: SUB L (1)
+  - x6: SUB (HL) (1)
+  - x7: SUB A (1)
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF
+- Ax
+  - x0
+  - x1
+  - x2
+  - x3
+  - x4
+  - x5
+  - x6
+  - x7
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF
+- Bx
+  - x0
+  - x1
+  - x2
+  - x3
+  - x4
+  - x5
+  - x6
+  - x7
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF
+- Cx
+  - x0
+  - x1
+  - x2
+  - x3
+  - x4
+  - x5
+  - x6
+  - x7
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF
+- Dx
+  - x0
+  - x1
+  - x2
+  - x3
+  - x4
+  - x5
+  - x6
+  - x7
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF
+- Ex
+  - x0
+  - x1
+  - x2
+  - x3
+  - x4
+  - x5
+  - x6
+  - x7
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF
+- Fx
+  - x0
+  - x1
+  - x2
+  - x3
+  - x4
+  - x5
+  - x6
+  - x7
+  - x8
+  - x9
+  - xA
+  - xB
+  - xC
+  - xD
+  - xE
+  - xF
