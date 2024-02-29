@@ -1,4 +1,4 @@
-import std/[strutils]
+import std/[strutils, monotimes, times]
 import lycheepkg/emulator
 
 proc chunkString(input: string): seq[string] =
@@ -33,5 +33,17 @@ when isMainModule:
   echo romContent
   var emu = initLycheeEmulator()
   emu.loadRom(romContent)
+
+  let sixtyhz = initDuration(microseconds=int(1000000/60))
+  let clockhz = initDuration(microseconds=int(1000000/500))
+  echo sixtyhz
+  var sixtylast = getMonoTime()
+  var clocklast = getMonoTime()
   while true:
-    emu.cycle()
+    let cur = getMonoTime()
+    if cur - sixtylast > sixtyhz:
+      # timers
+      sixtylast = getMonoTime()
+    if cur - clocklast > sixtyhz:
+      discard emu.cycle()
+      clocklast = getMonoTime()
