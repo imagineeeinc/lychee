@@ -33,4 +33,5 @@ when isMainModule:
   echo romContent
   var emu = initLycheeEmulator()
   emu.loadRom(romContent)
-  emu.start()
+  while true:
+    emu.cycle()

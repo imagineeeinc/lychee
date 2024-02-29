@@ -47,5 +47,5 @@ proc initLycheeEmulator*(): LycheeEmulator =
 proc loadRom*(self: LycheeEmulator, rom: seq[string]) =
   self.program = rom
 
-proc start*(self: LycheeEmulator) =
-  echo "start"
+proc cycle*(self: LycheeEmulator) =
+  echo "cycling"
