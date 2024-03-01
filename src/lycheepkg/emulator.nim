@@ -2,30 +2,20 @@ import strutils
 import std/[times]
 
 type Register = ref object
-  a: byte  # Accumulator [Wriable]              (Accu)
-  f: byte  # Flags [Non-writable]               (F) -> [https://gbdev.io/pandocs/CPU_Registers_and_Flags.html#the-flags-register-lower-8-bits-of-af-register]
-  b: byte  # Genral purpose registers [Wriable] (GEr)
-  c: byte  # Genral purpose registers [Wriable] (GEr)
-  d: byte  # Genral purpose registers [Wriable] (GEr)
-  e: byte  # Genral purpose registers [Wriable] (GEr)
-  h: byte  # Genral purpose registers [Wriable] (GEr)
-  l: byte  # Genral purpose registers [Wriable] (GEr)
-  pc: int # Program counter [Writable]         (PC)
-  sp: int # Stack pointer [Non-writable]       (SP)
+  a*: byte  # Accumulator [Wriable]              (Accu)
+  f*: byte  # Flags [Non-writable]               (F) -> [https://gbdev.io/pandocs/CPU_Registers_and_Flags.html#the-flags-register-lower-8-bits-of-af-register]
+  b*: byte  # Genral purpose registers [Wriable] (GEr)
+  c*: byte  # Genral purpose registers [Wriable] (GEr)
+  d*: byte  # Genral purpose registers [Wriable] (GEr)
+  e*: byte  # Genral purpose registers [Wriable] (GEr)
+  h*: byte  # Genral purpose registers [Wriable] (GEr)
+  l*: byte  # Genral purpose registers [Wriable] (GEr)
+  pc*: int # Program counter [Writable]         (PC)
+  sp*: int # Stack pointer [Non-writable]       (SP)
 type LycheeEmulator = ref object
-  r: Register
-  program: seq[string]
+  r*: Register
+  program*: seq[string]
 
-# proc loadProgram(self: LycheeEmulator, code: string) =
-#   var curCommand: seq[string] = newSeq[string]()
-#   for token in tokenize(code):
-#     if token.token == "\n" and token.isSep == true:
-#       self.program.add(curCommand)
-#       curCommand = newSeq[string]()
-#     elif token.token == "end":
-#       self.program.add(@["end"])
-#     elif token.isSep == false:
-#       curCommand.add(token.token)
 
 proc initLycheeEmulator*(): LycheeEmulator =
   result = LycheeEmulator(
@@ -49,11 +39,14 @@ proc loadRom*(self: LycheeEmulator, rom: seq[string]) =
 
 proc cycle*(self: LycheeEmulator): int =
   let pc = self.r.pc
-  let mar = fromHex[byte](self.program[pc])
+  let program = self.program
+  let mar = fromHex[byte](program[pc])
   # Most significant nibble
   let msn = mar shr 4
   # Least significant nibble
   let lsn = mar and 0x0f
+
+  inc self.r.pc
   case msn
   of 0x00:
     case lsn
@@ -64,7 +57,8 @@ proc cycle*(self: LycheeEmulator): int =
   of 0x03:
     case lsn
     of 0x0E:
-      self.r.a = fromHex[byte](self.program[pc+1])
+      # LD a, d8
+      self.r.a = fromHex[byte](program[pc+1])
       inc self.r.pc
     else:
       discard
@@ -83,7 +77,8 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x05:
       self.r.b = self.r.l
     of 0x06:
-      # TODO: get from 16 bit mem address
+      # TODO: Fetch from work ram
+      # self.r.b = fromHex[int](self.r.h.toHex & self.r.l.toHex)
       discard
     of 0x07:
       self.r.b = self.r.a
@@ -100,14 +95,60 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x0D:
       self.r.c = self.r.l
     of 0x0E:
-      # TODO: get from 16 bit mem address
+      # TODO: Fetch from work ram
+      # self.r.b = fromHex[int](self.r.h.toHex & self.r.l.toHex)
       discard
     of 0x0F:
       self.r.c = self.r.a
     else:
       discard
+  of 0x09:
+    case lsn
+    # sub R
+    of 0x00:
+      self.r.a = self.r.a - self.r.b
+    of 0x01:
+      self.r.a = self.r.a - self.r.c
+    of 0x02:
+      self.r.a = self.r.a - self.r.d
+    of 0x03:
+      self.r.a = self.r.a - self.r.e
+    of 0x04:
+      self.r.a = self.r.a - self.r.h
+    of 0x05:
+      self.r.a = self.r.a - self.r.l
+    of 0x06:
+      # TODO: Fetch from work ram and sub
+      # self.r.a = fromHex[int](self.r.h.toHex & self.r.l.toHex)
+      discard
+    of 0x07:
+      self.r.a = self.r.a -  self.r.a
+    of 0x08:
+      discard
+    of 0x09:
+      discard
+    of 0x0A:
+      discard
+    of 0x0B:
+      discard
+    of 0x0C:
+      discard
+    of 0x0D:
+      discard
+    of 0x0E:
+      discard
+    of 0x0F:
+      discard
+    else:
+      discard
+  of 0x0C:
+    case lsn
+    of 0x03:
+      # JP a16
+      self.r.pc = fromHex[int](program[pc+1] & program[pc+2])
+      echo self.r.pc
+    else:
+      discard
   else:
     discard
-  echo self.r.a
-  echo self.r.b
-  inc self.r.pc
+
