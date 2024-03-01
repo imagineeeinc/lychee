@@ -14,8 +14,9 @@ hideCursor()
 var tb = newTerminalBuffer(terminalWidth(), terminalHeight())
 
 tb.setForegroundColor(fgBlack, true)
-tb.drawRect(0, 0, 11, 7)
-tb.drawRect(12, 0, 12+11, 7)
+tb.drawRect(0, 0, 11, 9)
+tb.drawHorizLine(2, 9, 7, doubleStyle=true)
+tb.drawRect(12, 0, 12+11, 9)
 #tb.drawHorizLine(2, 38, 3, doubleStyle=true)
 
 #tb.write(2, 2, "Press ", fgYellow, "ESC", fgWhite,
@@ -92,5 +93,6 @@ when isMainModule:
     tb.write(2, 4, resetStyle, "HL: ", fgGreen, emu.r.h.toHex, emu.r.l.toHex)
     tb.write(2, 5, resetStyle, "PC: ", fgGreen, toHex(emu.r.pc, 4))
     tb.write(2, 6, resetStyle, "SP: ", fgGreen, toHex(emu.r.sp, 4))
+    tb.write(2, 8, resetStyle, "MBR: ", fgGreen, emu.program[emu.r.pc])
 
     tb.display()
