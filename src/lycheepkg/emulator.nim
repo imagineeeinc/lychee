@@ -1,6 +1,8 @@
 import strutils
 import std/[times]
 
+const mem_size: int = 22528
+
 type Register = ref object
   a*: byte  # Accumulator [Wriable]              (Accu)
   f*: byte  # Flags [Non-writable]               (F) -> [https://gbdev.io/pandocs/CPU_Registers_and_Flags.html#the-flags-register-lower-8-bits-of-af-register]
@@ -12,14 +14,17 @@ type Register = ref object
   l*: byte  # Genral purpose registers [Wriable] (GEr)
   pc*: int # Program counter [Writable]         (PC)
   sp*: int # Stack pointer [Non-writable]       (SP)
+
+
 type LycheeEmulator = ref object
   r*: Register
   program*: seq[string]
+  workram*: array[mem_size, byte]
 
 
 proc initLycheeEmulator*(): LycheeEmulator =
   result = LycheeEmulator(
-    r:Register(
+    r: Register(
       a: 0x00,
       f: 0x00,
       b: 0x00,
@@ -31,7 +36,7 @@ proc initLycheeEmulator*(): LycheeEmulator =
       pc: 0,
       sp: 0
     ),
-    program:newSeq[string]()
+    program: newSeq[string]()
   )
 
 proc loadRom*(self: LycheeEmulator, rom: seq[string]) =
@@ -105,23 +110,23 @@ proc cycle*(self: LycheeEmulator): int =
   of 0x09:
     case lsn
     # sub R
-    of 0x00:
+    of 0x00: # sub b
       self.r.a = self.r.a - self.r.b
-    of 0x01:
+    of 0x01: # sub c
       self.r.a = self.r.a - self.r.c
-    of 0x02:
+    of 0x02: # sub d
       self.r.a = self.r.a - self.r.d
-    of 0x03:
+    of 0x03: # sub e
       self.r.a = self.r.a - self.r.e
-    of 0x04:
+    of 0x04: # sub h
       self.r.a = self.r.a - self.r.h
-    of 0x05:
+    of 0x05: # sub l
       self.r.a = self.r.a - self.r.l
-    of 0x06:
+    of 0x06: # sub (hl)
       # TODO: Fetch from work ram and sub
       # self.r.a = fromHex[int](self.r.h.toHex & self.r.l.toHex)
       discard
-    of 0x07:
+    of 0x07: # sub a
       self.r.a = self.r.a -  self.r.a
     of 0x08:
       discard
@@ -143,10 +148,24 @@ proc cycle*(self: LycheeEmulator): int =
       discard
   of 0x0C:
     case lsn
-    of 0x03:
-      # JP a16
+    of 0x03:# jp a16
       self.r.pc = fromHex[int](program[pc+1] & program[pc+2])
-      echo self.r.pc
+    else:
+      discard
+  of 0x0E:
+    case lsn
+    of 0x0A:# ld a16, A
+      # TODO: Fetch from work ram and sub
+      # self.r.a = fromHex[int](self.r.h.toHex & self.r.l.toHex)
+      discard
+    else:
+      discard
+  of 0x0F:
+    case lsn
+    of 0x0A:# ld A, a16
+      # TODO: Fetch from work ram and sub
+      # self.r.a = fromHex[int](self.r.h.toHex & self.r.l.toHex)
+      discard
     else:
       discard
   else:

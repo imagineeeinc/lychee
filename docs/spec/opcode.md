@@ -247,7 +247,7 @@
   - x7
   - x8
   - x9
-  - xA
+  - xA: LD a16, A (3)
   - xB
   - xC
   - xD
@@ -264,7 +264,7 @@
   - x7
   - x8
   - x9
-  - xA
+  - xA: LD A, a16 (3)
   - xB
   - xC
   - xD
