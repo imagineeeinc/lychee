@@ -54,16 +54,16 @@
   - x1
   - x2
   - x3
-  - x4
-  - x5
+  - x4: INC (HL)
+  - x5: DEC (HL)
   - x6
   - x7
   - x8
   - x9
   - xA
   - xB
-  - xC
-  - xD
+  - xC: INC A
+  - xD: DEC A
   - xE: LD A, d8 (2)
   - xF
 - 4x
