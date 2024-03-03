@@ -69,20 +69,15 @@ proc cycle*(self: LycheeEmulator): int =
       discard
   of 0x03:
     case lsn
-    of 0x04:
-      # inc (hl)
+    of 0x04:# inc (hl)
       inc self.workram[hl]
-    of 0x05:
-      # dec (hl)
+    of 0x05:# dec (hl)
       dec self.workram[hl]
-    of 0x0C:
-      # inc a
+    of 0x0C:# inc a
       inc self.r.a
-    of 0x0D:
-      # dec a
+    of 0x0D:# dec a
       dec self.r.a
-    of 0x0E:
-      # ld a, d8
+    of 0x0E:# ld a, d8
       self.r.a = fromHex[byte](program[pc+1])
       inc self.r.pc
     else:
@@ -307,6 +302,9 @@ proc cycle*(self: LycheeEmulator): int =
     case lsn
     of 0x03:# jp a16
       self.r.pc = fromHex[int](program[pc+1] & program[pc+2])
+    of 0x06:# add a, d8
+      self.r.a += fromHex[byte](program[pc+1])
+      inc self.r.pc
     else:
       discard
   of 0x0E:
