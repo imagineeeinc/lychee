@@ -6,6 +6,12 @@ const mem_offset*: int = 0x8001
 
 const workmem_start: int = 0xA000
 
+type Flags = ref object
+  c*: bool # carry
+  z*: bool # zero
+  n*: bool # subtraction
+  h*: bool # half carry
+
 type Register = ref object
   a*: byte  # Accumulator [Wriable]              (Accu)
   f*: byte  # Flags [Non-writable]               (F) -> [https://gbdev.io/pandocs/CPU_Registers_and_Flags.html#the-flags-register-lower-8-bits-of-af-register]
@@ -21,6 +27,7 @@ type Register = ref object
 
 type LycheeEmulator* = ref object
   r*: Register
+  f*: Flags
   program*: seq[string]
   workram*: array[mem_size+vmem_size, byte]
 
@@ -38,6 +45,12 @@ proc initLycheeEmulator*(): LycheeEmulator =
       l: 0x00,
       pc: 0,
       sp: 0
+    ),
+    f: Flags(
+      c: false,
+      z: false,
+      n: false,
+      h: false
     ),
     program: newSeq[string]()
   )
