@@ -320,6 +320,13 @@ proc cycle*(self: LycheeEmulator): int =
       inc self.r.pc
     else:
       discard
+  of 0x0D:
+    case lsn
+    of 0x06: # sub a, d8
+      self.r.a -= fromHex[byte](program[pc+1])
+      inc self.r.pc
+    else:
+      discard
   of 0x0E:
     case lsn
     of 0x0A:# ld a16, a
