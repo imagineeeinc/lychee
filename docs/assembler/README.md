@@ -47,6 +47,10 @@ Each instruction is on a new line, and this is very important or the assembler w
 
 ```
 ld a $10
+\/ \ \_/
+||  \_\\_>Operands
+||
+Opcode
 ```
 
 ### Symbols
