@@ -88,7 +88,7 @@ Lychee uses a 16 bit address bus, thus 65536 possible address locations. This is
 1. ($0000-$8000) 32 kb: ROM
 2. ($8001-$9680) 5760 bytes: Character display memory
 3. ($9681-$9999) 2432 bytes: Flags & I/O
-4. ($A000 - $FFFF) 24 kb: Work RAM (High RAM)
+4. ($A000 - $FFFF) 24 kb: Work RAM
 
 #### Character display memory
 Between `$8001`-`$9680` is where all the character data is stored. For each address that stores the character, the adjacent memory address is the character's colour data.
