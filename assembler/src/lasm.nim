@@ -1,6 +1,6 @@
 let doc = """
 Usage:
-  lasm <file>
+  lasm <file> <output>
 
 Options:
   -h --help     Show this screen.
@@ -14,4 +14,5 @@ when isMainModule:
   let args = docopt(doc, version = "0.1.0", help=true)
   if args["<file>"]:
     let code = readFile($args["<file>"])
-    discard assemble(code)
+    let output = assemble(code)
+    writeFile($args["<output>"], output)
