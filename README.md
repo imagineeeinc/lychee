@@ -6,7 +6,7 @@ Lychee is a simple and bare bones emulator for a fictional computer with an inst
 **Still a work in progress, as the instruction set and docs is being added** 
 
 ## Specification
-Check out the `docs/specs` folder for more on opcodes and specification.
+Check out the [`docs/specs`](docs/spec) folder for more on opcodes and specification.
 
 ## ROMS
 Roms are either written in raw hex, using a hex editor (example roms in `/examples/roms`). Or use the official assembler found in the `/assembler` directory. Assembly examples are found in `/examples/asm`.
