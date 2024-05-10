@@ -7,3 +7,5 @@
   - ascii characters + extras
   - 4 bit colour (16 colours)
   - foreground colour and background colour
+- Input
+  - ascii keyboard
