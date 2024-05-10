@@ -13,7 +13,7 @@ Roms are either written in raw hex, using a hex editor. Or the official assemble
 
 Examples are found in `/assembler/examples`.
 
-And more info on the assembler at [`assembler/docs`](assembler/docs/)
+And more info on the assembler at [`docs/assembler`](docs/assembler)
 
 ## Compilation
 Make sure the Nim compiler and Nimble package manager is installed.
