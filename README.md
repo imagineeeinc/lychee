@@ -3,6 +3,8 @@ A bare bones 8 bit computer emulator.
 ### About
 Lychee is a simple and bare bones emulator for a fictional computer with an instruction set heavily based on the GameBoy's CPU. Lychee is built to be restraining with no graphics, only supporting text mode graphics, and a ascii based keyboard.
 
+**Still a work in progress, as the instruction set and docs is being added** 
+
 ## Specification
 Check out the `docs/specs` folder for more on opcodes and specification.
 
