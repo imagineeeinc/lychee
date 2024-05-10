@@ -9,23 +9,16 @@ Lychee is a simple and bare bones emulator for a fictional computer with an inst
 Check out the `docs/specs` folder for more on opcodes and specification.
 
 ## ROMS
-Roms are either written in raw hex, using a hex editor. Or the official assembler found in the `/assembler` directory.
-
-Examples are found in `/assembler/examples`.
+Roms are either written in raw hex, using a hex editor (example roms in `/examples/roms`). Or use the official assembler found in the `/assembler` directory. Assembly examples are found in `/examples/asm`.
 
 And more info on the assembler at [`docs/assembler`](docs/assembler)
 
-## Compilation
-Make sure the Nim compiler and Nimble package manager is installed.
+## Usage
+### Compilation
+#### Compiling the Emulator
+Make sure the [Nim compiler and Nimble package manager](https://nim-lang.org/) is installed.
 
-To compile we need the [sokol-nim](https://github.com/floooh/sokol-nim) graphics library. Clone the repo locally, and install using nimble.
-```bash
-git clone https://github.com/floooh/sokol-nim.git
-cd sokol-nim
-nimble install
-```
-
-Next clone this repo and run.
+Clone this repo and compile using nimble.
 ```bash
 git clone https://github.com/imagineeeinc/lychee.git
 cd lychee
@@ -36,7 +29,7 @@ nimble debug
 # Build release
 nimble release
 ```
-### Compiling the assembler
+#### Compiling the assembler
 ```bash
 # cd into the assembler
 cd assembler
