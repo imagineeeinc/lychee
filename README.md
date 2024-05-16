@@ -9,6 +9,8 @@ Lychee is a simple and bare bones emulator for a fictional computer with an inst
 
 **Still a work in progress, as the instruction set and docs is being added** 
 
+## Docs
+Check out the [`docs`](docs) folder for all the docs. Or, go to the auto generated [gitbook (imagineee.gitbook.io/lychee)](https://imagineee.gitbook.io/lychee)
 ## Specification
 Check out the [`docs/specs`](docs/spec) folder for more on opcodes and specification.
 
