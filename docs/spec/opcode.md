@@ -8,7 +8,7 @@
   - x6
   - x7
   - x8
-  - x9
+  - x9: ADD HL BC
   - xA
   - xB
   - xC
@@ -25,7 +25,7 @@
   - x6
   - x7
   - x8
-  - x9
+  - x9: ADD HL DE
   - xA
   - xB
   - xC
@@ -42,7 +42,7 @@
   - x6
   - x7
   - x8
-  - x9
+  - x9: ADD HL HL
   - xA
   - xB
   - xC
@@ -205,7 +205,7 @@
 - Cx
   - x0
   - x1
-  - x2
+  - x2: JP NZ a16 (3)
   - x3: JP a16 (3)
   - x4
   - x5
@@ -213,7 +213,7 @@
   - x7
   - x8
   - x9
-  - xA
+  - xA: JP Z a16 (3)
   - xB
   - xC
   - xD

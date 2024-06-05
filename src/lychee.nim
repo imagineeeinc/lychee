@@ -1,6 +1,22 @@
+let doc = """
+Lychee Emulator
+
+Usage:
+  lychee <rom>
+  lychee <rom> -d
+  lychee <rom> --paused
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  -d            Launch in debug mode, which runs at 1Hz.
+  --paused      Launch paused, good for steping instruction by instruction.
+"""
+
 import std/[strutils, monotimes, times]
 
 import illwill
+import docopt
 
 import sokol/log as slog
 import sokol/gfx as sg
@@ -10,6 +26,9 @@ import sokol/glue as sglue
 
 import lycheepkg/emulator
 import fileLoading
+
+# Args
+let args = docopt(doc, version = "Lychee Desktop CLI 0.1.0")
 
 # sokol setup
 const passAction = PassAction(
@@ -87,20 +106,20 @@ const color_table = [
 ]
 
 # lychee clock
-var debug: bool = false
-let sixtyhz = initDuration(microseconds=int(1000000/60))
+var debug: bool = if args["-d"]: true else: false
+let sixtyhz = initDuration(milliseconds=int(1000/60))
 let debugclockhz = initDuration(seconds=1)
 let defaultclockhz = initDuration(microseconds=int(1000000/500))
-var clockhz = defaultclockhz
+var clockhz = if args["-d"]: debugclockhz else: defaultclockhz
 var sixtylast = getMonoTime()
 var clocklast = getMonoTime()
-var paused: bool = false
+var paused: bool = if args["--paused"]: true else: false
 
 proc lycheeDraw(emu: LycheeEmulator) =
   sdtx.font(0)
   for y in 0..44:
     for x in 0..63:
-      let pos = (x + y)*2
+      let pos = (x + y*63)*2
       var c: int = fromHex[int](emu.ram[pos+mem_offset].toHex)
       let color = emu.ram[pos+mem_offset+1]
       # Most significant nibble
@@ -158,7 +177,7 @@ proc lycheeUpdate(emu: LycheeEmulator) =
   tb.write(2, 6, resetStyle, "SP: ", fgGreen, toHex(emu.r.sp, 4))
   tb.write(2, 8, resetStyle, "MBR: ", fgGreen, emu.ram[emu.r.pc].toHex)
   tb.write(13, 4, resetStyle, "Z: ", fgGreen, if emu.f.z: "1" else: "0")
-  tb.write(13, 5, resetStyle, "C: ", fgGreen, if emu.f.c: "1" else: "0")
+  tb.write(13, 5, resetStyle, "C: ", fgGreen, toHex(emu.f.c, 2))
 
   tb.display()
 
