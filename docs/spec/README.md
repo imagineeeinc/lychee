@@ -49,7 +49,7 @@ The predefined colours are set individually by each display or emulator. The gen
 ## CPU
 The CPU heavily borrows many of the instruction set and behaviours from a GameBoy. It uses an 8 bit instruction set and a 16 bit address bus.
 
-However the CPU is clocked at only 500Hz (over and under clock-able). The CPU also contains a fixed 60Hz timer, that can be used to timed operations.
+However the CPU is clocked at only 100MHz (over and under clock-able). The CPU also contains a fixed 60Hz timer, that can be used to timed operations.
 
 ### Registers
 - `a`: Accumulator
