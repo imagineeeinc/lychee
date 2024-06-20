@@ -5,9 +5,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-commits:
+  nightly:
+    name: Deploy Nightly
     runs-on: windows-latest
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
