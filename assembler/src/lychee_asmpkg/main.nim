@@ -10,6 +10,8 @@ proc assemble*(code: string): seq[byte] =
   for n in 0..<len(codeTree):
     let line = codeTree[n]
     let piece = line.split(" ")
+    if piece[0].toLowerAscii().startsWith("#"):
+      continue
     case piece[0].toLowerAscii()
     of "nop":
       rom.add(byte 0x00)
@@ -54,6 +56,8 @@ proc assemble*(code: string): seq[byte] =
       of "a":
         msb = byte 0x70
         shift = shift_size
+      of "timer":
+        msb = byte 0xe0
 
       case piece[2].toLowerAscii()
       of "b":
@@ -72,7 +76,13 @@ proc assemble*(code: string): seq[byte] =
         if not hl:
           rom.add(bitor[byte](msb, 0x06+shift))
       of "a":
-        rom.add(bitor[byte](msb, 0x07+shift))
+        if msb == byte 0xe0:
+          rom.add(byte 0xe3)
+        else:
+          rom.add(bitor[byte](msb, 0x07+shift))
+      of "timer":
+        if msb == byte 0x70:
+          rom.add(byte 0xe4)
       else:
         if piece[2].startsWith("$"):
           rom.add(byte 0x3e)
@@ -147,10 +157,17 @@ proc assemble*(code: string): seq[byte] =
       of "z":
         rom.add(byte 0xca)
         operand_pos += 1
+      of "nc":
+        rom.add(byte 0xd2)
+        operand_pos += 1
+      of "c":
+        rom.add(byte 0xda)
+        operand_pos += 1
       else:
         rom.add(byte 0xc3)
       if piece[operand_pos].toLowerAscii().startsWith("$"):
-        rom.add(fromHex[byte](piece[1][1..^1]))
+        rom.add(fromHex[byte](piece[1][1..2]))
+        rom.add(fromHex[byte](piece[1][3..4]))
       elif piece[operand_pos].toLowerAscii().startsWith("&"):
         rom.add(byte 0x00)
         rom.add(byte 0x00)

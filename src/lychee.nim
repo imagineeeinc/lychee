@@ -13,7 +13,7 @@ Options:
   --paused      Launch paused, good for steping instruction by instruction.
 """
 
-import std/[strutils, monotimes, times, locks]
+import std/[strutils, monotimes, times]
 
 import illwill
 import docopt
@@ -137,6 +137,8 @@ proc runUpdate(emu: LycheeEmulator) =
   let cur = getMonoTime()
   if cur - sixtylast > sixtyhz:
     # timers
+    if emu.r.timer != 0:
+      dec emu.r.timer
     sixtylast = getMonoTime()
   if cur - clocklast > clockhz:
     let exit_code = emu.cycle()
@@ -161,7 +163,7 @@ proc lycheeUpdate(emu: LycheeEmulator) =
       tb.write(13, 1, resetStyle, "Debug: ", fgRed, "Off")
   of Key.Space:
     paused = not paused
-    tb.write(13, 2, resetStyle, "Paused:", fgGreen, if paused: "On " else: "Off")
+    tb.write(13, 2, resetStyle, "Paused:", if paused: fgGreen else: fgRed, if paused: "On " else: "Off")
   of Key.N:
     if paused:
       runUpdate(emu)
@@ -177,6 +179,7 @@ proc lycheeUpdate(emu: LycheeEmulator) =
   tb.write(2, 8, resetStyle, "MBR: ", fgGreen, emu.ram[emu.r.pc].toHex)
   tb.write(13, 4, resetStyle, "Z: ", fgGreen, if emu.f.z: "1" else: "0")
   tb.write(13, 5, resetStyle, "C: ", fgGreen, toHex(emu.f.c, 2))
+  tb.write(13, 6, resetStyle, "Timer: ", fgGreen, toHex(emu.r.timer, 2))
 
   tb.display()
 

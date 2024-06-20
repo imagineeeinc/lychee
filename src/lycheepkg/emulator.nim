@@ -475,6 +475,11 @@ proc cycle*(self: LycheeEmulator): int =
       discard
   of 0x0D:
     case lsn
+    of 0x02:# jp NC a16
+      if c == 0x00:
+        self.r.pc = a16
+      else:
+        inc(self.r.pc, 2)
     of 0x06: # sub a, d8
       let temp = self.r.a
       self.r.a -= self.ram[pc+1]
@@ -483,6 +488,11 @@ proc cycle*(self: LycheeEmulator): int =
       if self.r.a == 0x00:
         self.f.z = true
       inc self.r.pc
+    of 0x0A:# jp C a16
+      if c != 0x00:
+        self.r.pc = a16
+      else:
+        inc(self.r.pc, 2)
     else:
       discard
   of 0x0E:
