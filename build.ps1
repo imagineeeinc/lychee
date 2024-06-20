@@ -1,4 +1,4 @@
-nimble build --threading:on --d:release -y
+nimble build --threads:on --d:release -y
 cd assembler
 nimble build --d:release -y
 cd ..
