@@ -17,11 +17,9 @@ jobs:
         with:
           version: binary:2.0.2
 
-      - name: Set up PowerShell
-        shell: pwsh
-
       - name: Check for commits today
         id: check_commits
+        shell: pwsh
         run: |
           # Get the current date in YYYY-MM-DD format
           $today = (Get-Date).ToString("yyyy-MM-dd")
@@ -38,6 +36,7 @@ jobs:
 
       - name: Run Build if Commits Present
         if: steps.check_commits.outputs.commits_present == 'true'
+        shell: pwsh
         run: |
           echo "Commits were found for today. Running build script..."
           ./build.ps1
