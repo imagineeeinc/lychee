@@ -1,0 +1,50 @@
+name: Deploy Nightly
+on:
+  schedule:
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-commits:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Install Nim
+      - uses: iffy/install-nim@v5
+      with:
+        version: binary:2.0.2
+
+      - name: Set up PowerShell
+        shell: pwsh
+
+      - name: Check for commits today
+        id: check_commits
+        run: |
+          # Get the current date in YYYY-MM-DD format
+          $today = (Get-Date).ToString("yyyy-MM-dd")
+
+          # Get the list of commits for today
+          $commits = git log --since="$today 00:00:00" --until="$today 23:59:59" --pretty=format:"%H"
+
+          # If there are no commits, set the output to 'false'
+          if (-not $commits) {
+            echo "::set-output name=commits_present::false"
+          } else {
+            echo "::set-output name=commits_present::true"
+          }
+
+      - name: Run Build if Commits Present
+        if: steps.check_commits.outputs.commits_present == 'true'
+        run: |
+          echo "Commits were found for today. Running build script..."
+          ./build.ps1
+
+      - name: Upload Build Artifact
+        if: steps.check_commits.outputs.commits_present == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: lychee-build-windows
+          path: lychee-build-win.zip

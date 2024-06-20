@@ -5,6 +5,6 @@ cd ..
 $compress = @{
   Path = "./lychee.exe", "assembler/lasm.exe", "docs", "examples", "README.md", "lychee.png"
   CompressionLevel = "Fastest"
-  DestinationPath = "lychee-build.zip"
+  DestinationPath = "lychee-build-win.zip"
 }
 Compress-Archive @compress
