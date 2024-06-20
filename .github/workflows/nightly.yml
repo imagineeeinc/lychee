@@ -14,8 +14,8 @@ jobs:
       
       - name: Install Nim
       - uses: iffy/install-nim@v5
-      with:
-        version: binary:2.0.2
+        with:
+          version: binary:2.0.2
 
       - name: Set up PowerShell
         shell: pwsh
