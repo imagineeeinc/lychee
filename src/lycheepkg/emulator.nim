@@ -1,4 +1,4 @@
-import strutils, system
+import strutils, system, std/[bitops]
 
 const mem_size: int = 24576 # 24kb
 const vmem_size: int = 5760 # 5.6kb
@@ -365,41 +365,163 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x0A:
       case lsn
       of 0x00: # and b
-        self.r.a = self.r.a and self.r.b
+        self.r.a = bitand[byte](self.r.a, self.r.b)
         if self.r.a == 0x00:
           self.f.z = true
       of 0x01: # and c
-        self.r.a = self.r.a and self.r.c
+        self.r.a = bitand[byte](self.r.a, self.r.c)
         if self.r.a == 0x00:
           self.f.z = true
       of 0x02: # and d
-        self.r.a = self.r.a and self.r.d
+        self.r.a = bitand[byte](self.r.a, self.r.d)
         if self.r.a == 0x00:
           self.f.z = true
       of 0x03: # and e
-        self.r.a = self.r.a and self.r.e
+        self.r.a = bitand[byte](self.r.a, self.r.e)
         if self.r.a == 0x00:
           self.f.z = true
       of 0x04: # and h
-        self.r.a = self.r.a and self.r.h
+        self.r.a = bitand[byte](self.r.a, self.r.h)
         if self.r.a == 0x00:
           self.f.z = true
       of 0x05: # and l
-        self.r.a = self.r.a and self.r.l
+        self.r.a = bitand[byte](self.r.a, self.r.l)
         if self.r.a == 0x00:
           self.f.z = true
       of 0x06: # and (hl)
-        self.r.a = self.r.a and self.ram[hl]
+        self.r.a = bitand[byte](self.r.a, self.ram[hl])
         if self.r.a == 0x00:
           self.f.z = true
       of 0x07: # and a
-        self.r.a = self.r.a and self.r.a
+        self.r.a = bitand[byte](self.r.a, self.r.a)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x08: # xor b
+        self.r.a = bitxor[byte](self.r.a, self.r.b)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x09: # xor c
+        self.r.a = bitxor[byte](self.r.a, self.r.c)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x0A: # xor d
+        self.r.a = bitxor[byte](self.r.a, self.r.d)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x0B: # xor e
+        self.r.a = bitxor[byte](self.r.a, self.r.e)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x0C: # xor h
+        self.r.a = bitxor[byte](self.r.a, self.r.h)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x0D: # xor l
+        self.r.a = bitxor[byte](self.r.a, self.r.l)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x0E: # xor (hl)
+        self.r.a = bitxor[byte](self.r.a, self.ram[hl])
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x0F: # xor a
+        self.r.a = bitxor[byte](self.r.a, self.r.a)
         if self.r.a == 0x00:
           self.f.z = true
       else:
         discard
     of 0x0B:
-      discard
+      case lsn
+      of 0x00: # or b
+        self.r.a = bitor[byte](self.r.a, self.r.b)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x01: # or c
+        self.r.a = bitor[byte](self.r.a, self.r.c)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x02: # or d
+        self.r.a = bitor[byte](self.r.a, self.r.d)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x03: # or e
+        self.r.a = bitor[byte](self.r.a, self.r.e)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x04: # or h
+        self.r.a = bitor[byte](self.r.a, self.r.h)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x05: # or l
+        self.r.a = bitor[byte](self.r.a, self.r.l)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x06: # or (hl)
+        self.r.a = bitor[byte](self.r.a, self.ram[hl])
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x07: # or a
+        self.r.a = bitor[byte](self.r.a, self.r.a)
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x08: # cp b
+        let temp = self.r.a
+        let res = self.r.a - self.r.b
+        if temp < self.r.b:
+          self.f.c = res
+        if res == 0x00:
+          self.f.z = true
+      of 0x09: # cp c
+        let temp = self.r.a
+        let res = self.r.a - self.r.c
+        if temp < self.r.c:
+          self.f.c = res
+        if res == 0x00:
+          self.f.z = true
+      of 0x0A: # cp d
+        let temp = self.r.a
+        let res = self.r.a - self.r.d
+        if temp < self.r.d:
+          self.f.c = res
+        if res == 0x00:
+          self.f.z = true
+      of 0x0B: # cp e
+        let temp = self.r.a
+        let res = self.r.a - self.r.e
+        if temp < self.r.e:
+          self.f.c = res
+        if res == 0x00:
+          self.f.z = true
+      of 0x0C: # cp h
+        let temp = self.r.a
+        let res = self.r.a - self.r.h
+        if temp < self.r.h:
+          self.f.c = res
+        if res == 0x00:
+          self.f.z = true
+      of 0x0D: # cp l
+        let temp = self.r.a
+        let res = self.r.a - self.r.l
+        if temp < self.r.l:
+          self.f.c = res
+        if res == 0x00:
+          self.f.z = true
+      of 0x0E: # cp (hl)
+        let temp = self.r.a
+        let res = self.r.a - self.ram[hl]
+        if temp < self.ram[hl]:
+          self.f.c = res
+        if res == 0x00:
+          self.f.z = true
+      of 0x0F: # cp a
+        let temp = self.r.a
+        let res = self.r.a - self.r.a
+        if temp < self.r.a:
+          self.f.c = res
+        if res == 0x00:
+          self.f.z = true
+      else:
+        discard
     of 0x0C:
       discard
     of 0x0D:

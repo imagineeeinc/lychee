@@ -34,6 +34,8 @@ proc assemble*(code: string): seq[byte] =
       let shift_size: byte = byte 0x08
       var shift: byte = byte 0x00
       var hl: bool = false
+      var direct: bool = false
+      var direct_value: array[2, byte]
       case piece[1].toLowerAscii()
       of "b":
         msb = byte 0x40
@@ -58,6 +60,10 @@ proc assemble*(code: string): seq[byte] =
         shift = shift_size
       of "timer":
         msb = byte 0xe0
+      else:
+        if piece[1].startsWith("$"):
+          direct = true
+          direct_value = [fromHex[byte](piece[1][1..2]), fromHex[byte](piece[1][3..^1])]
 
       case piece[2].toLowerAscii()
       of "b":
@@ -78,6 +84,12 @@ proc assemble*(code: string): seq[byte] =
       of "a":
         if msb == byte 0xe0:
           rom.add(byte 0xe3)
+        elif direct == true:
+          rom.add(0xea)
+          rom.add(direct_value[0])
+          rom.add(direct_value[1])
+          inc pc
+          inc pc
         else:
           rom.add(bitor[byte](msb, 0x07+shift))
       of "timer":
@@ -173,6 +185,81 @@ proc assemble*(code: string): seq[byte] =
           inc pc
         else:
           rom.add(byte 0xa7)
+    of "xor":
+      case piece[2].toLowerAscii()
+      of "b":
+        rom.add(byte 0xa8)
+      of "c":
+        rom.add(byte 0xa9)
+      of "d":
+        rom.add(byte 0xaa)
+      of "e":
+        rom.add(byte 0xab)
+      of "h":
+        rom.add(byte 0xac)
+      of "l":
+        rom.add(byte 0xad)
+      of "(hl)":
+        rom.add(byte 0xae)
+      of "a":
+        rom.add(byte 0xaf)
+      else:
+        if piece[2].startsWith("$"):
+          rom.add(byte 0xee)
+          rom.add(fromHex[byte](piece[2][1..^1]))
+          inc pc
+        else:
+          rom.add(byte 0xaf)
+    of "or":
+      case piece[2].toLowerAscii()
+      of "b":
+        rom.add(byte 0xb0)
+      of "c":
+        rom.add(byte 0xb1)
+      of "d":
+        rom.add(byte 0xb2)
+      of "e":
+        rom.add(byte 0xb3)
+      of "h":
+        rom.add(byte 0xb4)
+      of "l":
+        rom.add(byte 0xb5)
+      of "(hl)":
+        rom.add(byte 0xb6)
+      of "a":
+        rom.add(byte 0xb7)
+      else:
+        if piece[2].startsWith("$"):
+          rom.add(byte 0xf6)
+          rom.add(fromHex[byte](piece[2][1..^1]))
+          inc pc
+        else:
+          rom.add(byte 0xb7)
+    of "cp":
+      case piece[2].toLowerAscii()
+      of "b":
+        rom.add(byte 0xb8)
+      of "c":
+        rom.add(byte 0xb9)
+      of "d":
+        rom.add(byte 0xba)
+      of "e":
+        rom.add(byte 0xbb)
+      of "h":
+        rom.add(byte 0xbc)
+      of "l":
+        rom.add(byte 0xbd)
+      of "(hl)":
+        rom.add(byte 0xbe)
+      of "a":
+        rom.add(byte 0xbf)
+      else:
+        if piece[2].startsWith("$"):
+          rom.add(byte 0xfe)
+          rom.add(fromHex[byte](piece[2][1..^1]))
+          inc pc
+        else:
+          rom.add(byte 0xbf)
     of "jp":
       var operand_pos = 1
       case piece[1].toLowerAscii()
