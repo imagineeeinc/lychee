@@ -2,7 +2,7 @@ import strutils, system, std/[bitops]
 
 const mem_size: int = 24576 # 24kb
 const vmem_size: int = 5760 # 5.6kb
-const mem_offset*: int = 0x8001
+const mem_offset*: int = 0x8000
 const ram_size*: int = 64 * 1024
 
 const workmem_start: int = 0xA000

@@ -15,6 +15,7 @@ To read the full specification as a list read the [`specs` document](spec.md)
 		- [Instruction set](#instruction-set)
 			- [Assembly](#assembly)
 	- [Memory](#memory)
+		- [Character display memory](#character-display-memory)
 	- [Audio](#audio)
 	- [Input](#input)
 
@@ -84,10 +85,10 @@ Lychee Assembly, the custom assembly dialect. This version include some syntax s
 Lychee uses memory-mapped memory and I/O. This means all that the ROM, Work RAM, Character display memory and I/O all live under the same memory address range.
 
 Lychee uses a 16 bit address bus, thus 65536 possible address locations. This is then split between the different parts of the machine.
-1. ($0000-$8000) 32 kb: ROM
-2. ($8001-$9680) 5760 bytes: Character display memory
-3. ($9681-$9780) 255 bytes: Flags & I/O
-4. ($9781-$9999) 536 bytes: Reserved stack ram
+1. ($0000-$7FFF) 32 kb: ROM
+2. ($8000-$967F) 5760 bytes: Character display memory
+3. ($9680-$977F) 255 bytes: Flags & I/O
+4. ($9780-$9999) 538 bytes: Reserved stack ram
 5. ($A000 - $FFFF) 24 kb: Work RAM
 
 ### Character display memory
