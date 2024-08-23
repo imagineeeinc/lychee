@@ -27,7 +27,7 @@ ld (hl) a
 loop:
 # check if number is 0
 ld a Timer
-sub a $01
+cp a $01
 # if 0 then jump to reset timer
 jp c &settimer
 # else loop
