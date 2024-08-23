@@ -148,6 +148,31 @@ proc assemble*(code: string): seq[byte] =
           inc pc
         else:
           rom.add(byte 0x97)
+    of "and":
+      case piece[2].toLowerAscii()
+      of "b":
+        rom.add(byte 0xa0)
+      of "c":
+        rom.add(byte 0xa1)
+      of "d":
+        rom.add(byte 0xa2)
+      of "e":
+        rom.add(byte 0xa3)
+      of "h":
+        rom.add(byte 0xa4)
+      of "l":
+        rom.add(byte 0xa5)
+      of "(hl)":
+        rom.add(byte 0xa6)
+      of "a":
+        rom.add(byte 0xa7)
+      else:
+        if piece[2].startsWith("$"):
+          rom.add(byte 0xe6)
+          rom.add(fromHex[byte](piece[2][1..^1]))
+          inc pc
+        else:
+          rom.add(byte 0xa7)
     of "jp":
       var operand_pos = 1
       case piece[1].toLowerAscii()

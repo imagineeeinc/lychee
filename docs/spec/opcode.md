@@ -169,14 +169,14 @@
   - xE
   - xF
 - Ax
-  - x0
-  - x1
-  - x2
-  - x3
-  - x4
-  - x5
-  - x6
-  - x7
+  - x0: AND A B (1)
+  - x1: AND A C (1)
+  - x2: AND A D (1)
+  - x3: AND A E (1)
+  - x4: AND A H (1)
+  - x5: AND A L (1)
+  - x6: AND A (HL) (1)
+  - x7: AND A A (1)
   - x8
   - x9
   - xA
@@ -243,7 +243,7 @@
   - x3: LD Timer a (1)
   - x4: LD a Timer (1)
   - x5
-  - x6
+  - x6: AND A d8 (2)
   - x7
   - x8
   - x9

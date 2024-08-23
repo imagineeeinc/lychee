@@ -363,7 +363,41 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x09:
       discard
     of 0x0A:
-      discard
+      case lsn
+      of 0x00: # and b
+        self.r.a = self.r.a and self.r.b
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x01: # and c
+        self.r.a = self.r.a and self.r.c
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x02: # and d
+        self.r.a = self.r.a and self.r.d
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x03: # and e
+        self.r.a = self.r.a and self.r.e
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x04: # and h
+        self.r.a = self.r.a and self.r.h
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x05: # and l
+        self.r.a = self.r.a and self.r.l
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x06: # and (hl)
+        self.r.a = self.r.a and self.ram[hl]
+        if self.r.a == 0x00:
+          self.f.z = true
+      of 0x07: # and a
+        self.r.a = self.r.a and self.r.a
+        if self.r.a == 0x00:
+          self.f.z = true
+      else:
+        discard
     of 0x0B:
       discard
     of 0x0C:
@@ -497,9 +531,6 @@ proc cycle*(self: LycheeEmulator): int =
       discard
   of 0x0E:
     case lsn
-    of 0x0A:# ld a16, a
-      self.ram[a16] = self.r.a
-      inc(self.r.pc, 2)
     of 0x03:# ld Timer, a
       self.r.timer = int self.r.a
       if self.r.timer == 0x00:
@@ -508,6 +539,13 @@ proc cycle*(self: LycheeEmulator): int =
       self.r.a = byte self.r.timer
       if self.r.a == 0x00:
         self.f.z = true
+    of 0x08:# and d8
+      self.r.a = self.r.a and self.ram[pc+1]
+      if self.r.a == 0x00:
+        self.f.z = true
+    of 0x0A:# ld a16, a
+      self.ram[a16] = self.r.a
+      inc(self.r.pc, 2)
     else:
       discard
   of 0x0F:
