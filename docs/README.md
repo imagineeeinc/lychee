@@ -10,3 +10,4 @@ Lychee is a simple and bare bones emulator for a fictional computer with an inst
 ## Contents
 - [Assembler](./assembler/)
 - [Specification](./spec/)
+- [Desktop](./desktop/)

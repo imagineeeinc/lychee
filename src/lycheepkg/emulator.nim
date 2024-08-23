@@ -63,6 +63,12 @@ proc loadRom*(self: LycheeEmulator, rom: seq[string]) =
     let instruction = self.program[pos]
     self.ram[pos] = fromHex[byte](instruction)
 
+proc mem_dump*(self: LycheeEmulator): seq[byte] =
+  var buf: seq[byte] = newSeq[byte](len(self.ram))
+  for pos in 0..<len(self.ram):
+    let instruction = self.ram[pos]
+    buf[pos] = instruction
+  result = buf
 
 proc cycle*(self: LycheeEmulator): int =
   let pc = self.r.pc
