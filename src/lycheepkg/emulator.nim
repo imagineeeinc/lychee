@@ -1,5 +1,4 @@
 import strutils
-import std/[times]
 
 const mem_size: int = 22528
 
