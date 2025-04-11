@@ -177,31 +177,31 @@
   - x5: AND A L (1)
   - x6: AND A (HL) (1)
   - x7: AND A A (1)
-  - x8
-  - x9
-  - xA
-  - xB
-  - xC
-  - xD
-  - xE
-  - xF
+  - x8: XOR A B (1)
+  - x9: XOR A C (1)
+  - xA: XOR A D (1)
+  - xB: XOR A E (1)
+  - xC: XOR A H (1)
+  - xD: XOR A L (1)
+  - xE: XOR A (HL) (1)
+  - xF: XOR A A (1)
 - Bx
-  - x0
-  - x1
-  - x2
-  - x3
-  - x4
-  - x5
-  - x6
-  - x7
-  - x8
-  - x9
-  - xA
-  - xB
-  - xC
-  - xD
-  - xE
-  - xF
+  - x0: OR A B (1)
+  - x1: OR A C (1)
+  - x2: OR A D (1)
+  - x3: OR A E (1)
+  - x4: OR A H (1)
+  - x5: OR A L (1)
+  - x6: OR A (HL) (1)
+  - x7: OR A A (1)
+  - x8: CP A B (1)
+  - x9: CP A C (1)
+  - xA: CP A D (1)
+  - xB: CP A E (1)
+  - xC: CP A H (1)
+  - xD: CP A L (1)
+  - xE: CP A (HL) (1)
+  - xF: CP A A (1)
 - Cx
   - x0
   - x1
@@ -251,7 +251,7 @@
   - xB
   - xC
   - xD
-  - xE
+  - xE: XOR A d8 (2)
   - xF
 - Fx
   - x0
@@ -260,7 +260,7 @@
   - x3
   - x4
   - x5
-  - x6
+  - x6: OR A d8 (2)
   - x7
   - x8
   - x9
@@ -268,5 +268,5 @@
   - xB
   - xC
   - xD
-  - xE
+  - xE: CP A d8 (2)
   - xF
