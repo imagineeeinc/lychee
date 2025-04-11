@@ -13,3 +13,25 @@ example rom:
 ```
 3e 0a 47 3e 14 90 c3 00 00
 ```
+
+## Compilation
+Make sure the Nim compiler and Nimble package manager is installed.
+
+To compile we need the [sokol-nim](https://github.com/floooh/sokol-nim) graphics library. Clone the repo locally, and install using nimble.
+```bash
+git clone https://github.com/floooh/sokol-nim.git
+cd sokol-nim
+nimble install
+```
+
+Next clone this repo and run.
+```bash
+git clone https://github.com/imagineeeinc/lychee.git
+cd lychee
+
+# Debug (Run)
+nimble debug
+
+# Build release
+nimble release
+```
