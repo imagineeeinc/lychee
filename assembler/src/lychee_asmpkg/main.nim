@@ -1,9 +1,14 @@
 import std/[strutils, bitops]
+import std/tables
 
 proc assemble*(code: string): seq[byte] =
   let codeTree: seq[string] = code.splitLines()
   var rom: seq[byte] = newSeq[byte]()
-  for line in codeTree:
+  var jp_list: Table[int, string] = initTable[int, string]()
+  var jp_labels: Table[string, int] = initTable[string, int]()
+  var pc: int = 0
+  for n in 0..<len(codeTree):
+    let line = codeTree[n]
     let piece = line.split(" ")
     case piece[0].toLowerAscii()
     of "nop":
@@ -66,6 +71,7 @@ proc assemble*(code: string): seq[byte] =
         if piece[2].startsWith("$"):
           rom.add(byte 0x3e)
           rom.add(fromHex[byte](piece[2][1..^1]))
+          inc pc
         else:
           rom.add(bitor[byte](msb, 0x07+shift))
     of "add":
@@ -90,6 +96,7 @@ proc assemble*(code: string): seq[byte] =
         if piece[2].startsWith("$"):
           rom.add(byte 0xc6)
           rom.add(fromHex[byte](piece[2][1..^1]))
+          inc pc
         else:
           rom.add(byte 0x87)
     of "sub":
@@ -114,10 +121,34 @@ proc assemble*(code: string): seq[byte] =
         if piece[2].startsWith("$"):
           rom.add(byte 0xd6)
           rom.add(fromHex[byte](piece[2][1..^1]))
+          inc pc
         else:
           rom.add(byte 0x97)
+    of "jp":
+      if piece[1].toLowerAscii().startsWith("$"):
+        rom.add(byte 0xc3)
+        rom.add(fromHex[byte](piece[1][1..^1]))
+      elif piece[1].toLowerAscii().startsWith("&"):
+        rom.add(byte 0xc3)
+        rom.add(byte 0x00)
+        rom.add(byte 0x00)
+        jp_list[pc] = piece[1][1..^1]
+        inc pc
+        inc pc
     else:
-      discard
+      if piece[0].endsWith(":"):
+        jp_labels[piece[0][0..^2]] = pc
+        dec pc
+    inc pc
+  for key, val in jp_list:
+    if val in jp_labels:
+      let loc: int = jp_labels[val]
+      if loc > 0xFF:
+        rom[key+1] = byte (loc and 0xFF)
+        rom[key+2] = byte ((loc shr 8) and 0xFF)
+      else:
+        rom[key+2] = byte loc
+  
   for i in rom:
     echo i.toHex
 

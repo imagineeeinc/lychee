@@ -8,6 +8,6 @@ ld a $01
 ld l a
 ld a $19
 ld (hl) a
-%increment:
+increment:
 inc (hl)
 jp &increment
