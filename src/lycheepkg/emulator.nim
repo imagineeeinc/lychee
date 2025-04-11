@@ -15,12 +15,12 @@ type Flags = ref object
 type Register = ref object
   a*: byte  # Accumulator [Wriable]              (Accu)
   f*: byte  # Flags [Non-writable]               (F) -> [https://gbdev.io/pandocs/CPU_Registers_and_Flags.html#the-flags-register-lower-8-bits-of-af-register]
-  b*: byte  # Genral purpose registers [Wriable] (GEr)
-  c*: byte  # Genral purpose registers [Wriable] (GEr)
-  d*: byte  # Genral purpose registers [Wriable] (GEr)
-  e*: byte  # Genral purpose registers [Wriable] (GEr)
-  h*: byte  # Genral purpose registers [Wriable] (GEr)
-  l*: byte  # Genral purpose registers [Wriable] (GEr)
+  b*: byte  # General purpose registers [Wriable] (GEr)
+  c*: byte  # General purpose registers [Wriable] (GEr)
+  d*: byte  # General purpose registers [Wriable] (GEr)
+  e*: byte  # General purpose registers [Wriable] (GEr)
+  h*: byte  # General purpose registers [Wriable] (GEr)
+  l*: byte  # General purpose registers [Wriable] (GEr)
   pc*: int # Program counter [Writable]         (PC)
   sp*: int # Stack pointer [Non-writable]       (SP)
 
