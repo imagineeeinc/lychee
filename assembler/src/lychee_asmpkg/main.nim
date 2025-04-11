@@ -21,6 +21,12 @@ proc assemble*(code: string): seq[byte] =
         rom.add(byte 0x34)
       of "a":
         rom.add(byte 0x3c)
+    of "dec":
+      case piece[1].toLowerAscii()
+      of "(hl)":
+        rom.add(byte 0x35)
+      of "a":
+        rom.add(byte 0x3d)
     of "ld":
       var msb: byte = byte 0x00
       let shift_size: byte = byte 0x08
