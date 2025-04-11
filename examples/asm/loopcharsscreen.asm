@@ -4,7 +4,7 @@ ld a $07
 ld e a
 ld a $80
 ld h a
-ld a $01
+ld a $00
 ld l a
 increment:
 ld a $32

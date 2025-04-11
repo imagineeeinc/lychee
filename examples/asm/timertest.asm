@@ -2,12 +2,12 @@ setup:
 # Load color
 ld a $80
 ld h a
-ld a $02
+ld a $01
 ld l a
 ld a $08
 ld (hl) a
 # Load initial char
-ld a $01
+ld a $00
 ld l a
 ld a $30
 ld (hl) a
