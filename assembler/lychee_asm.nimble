@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.0"
+version       = "0.2.0"
 author        = "imagineeeinc"
 description   = "An assembler for the lychee 8 bit computer"
 srcDir        = "src"

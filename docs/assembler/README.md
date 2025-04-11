@@ -12,6 +12,7 @@ Lychee assembly (and the instruction set) is *highly* similar to Gameboy assembl
 		- [Symbols](#symbols)
 		- [Addressing](#addressing)
 		- [Sections](#sections)
+		- [Datatypes](#datatypes)
 		- [Opcodes](#opcodes)
 
 ## Assembler (LASM)
@@ -58,6 +59,7 @@ Opcode
 ### Symbols
 Lychee assembly uses specialised symbols to to denote data types.
 - `$00` (Hex): A `$` followed by numeric values represents a hex value.
+- `.000` (Decimal): A `.` followed by numeric values represents a decimal value (16 bit values not supported yet).
 - `&name` (Section Names): A `&` followed by a tag represents a position in the rom, useful for jumps.
 - `(hl)` (Indirect): An `(` followed by `hl` followed by a `)` represents an indirect value. Means use the value in `hl` as the address to fetch from.
 
@@ -69,5 +71,33 @@ Lychee assembly uses specialised symbols to to denote data types.
 ### Sections
 Sections are placed before a piece of code and is useful for the jump instruction, define a section by adding tag name followed by a `:`. Anything below that tag will be ran. Do not if you don't move to somewhere else, the CPU will just move to the next section. And this can be used strategically by placing sections next to each other for a planned behaviour.
 
+### Datatypes
+There are datatypes in the assembler to allow for easier representation.
+- **Registers**
+  - Represents a register.
+  - One of 7 registers.
+  - Converted to correct instruction.
+	- See [`/spec/registers`](../spec/README.md#registers)
+- **16 bit Registers**
+  - Represents a register that is made of 2 adjacent registers.
+  - One of 3 registers.
+  - Converted to correct instruction.
+- **Hex**: `$XX`
+	- Represents a hex value.
+	- 16 bit values are 4 character long.
+  - Converted to binary.
+- **Decimal**: `.XXX`
+  - Represents a decimal value.
+  - Converted to binary.
+- **Section**: `&name`
+	- Represents a section name in the rom.
+	- Converted to correct jump location in binary.
+- **Indirect**: `(hl)`
+	- Represents an indirect value.
+	- Converted to correct instruction.
+- **Timer**: `timer`
+	- A unique register to point to the timer value.
+	- Converted to correct instruction.
+
 ### Opcodes
-To learn more about the available opcodes read [`/spec/opcode`](../spec/opcode.md). If you want to learn more about how some of the opcodes work, there is no documentation on it as of right now, however you can read about how some of them work on the [rgbds cpu reference](https://rgbds.gbdev.io/docs/v0.9.1/gbz80.7), as the instruction set is similar to the Gameboy.
+To learn more about the available opcodes read [`/spec/opcode`](../spec/opcode.md). If you want to learn more about how some of the opcodes work, there is no documentation on it as of right now, however you can read about how some of them work on the [rgbds cpu reference](https://rgbds.gbdev.io/docs/gbz80.7), as the instruction set is similar to the Gameboy.

@@ -4,6 +4,9 @@ import std/tables
 proc extractByte(code: string): byte =
   return fromHex[byte](code[1..^1])
 
+proc extractByteFromDec(code: string): byte =
+  return byte parseInt code[1..^1]
+
 proc extract2Bytes(code: string): array[2, byte] =
   return [fromHex[byte](code[1..2]), fromHex[byte](code[3..^1])]
 
@@ -124,6 +127,10 @@ proc assemble*(code: string): seq[byte] =
           rom.add(byte 0x3e)
           rom.add(extractByte(piece[2]))
           inc pc
+        elif piece[2].startsWith("."):
+          rom.add(byte 0x3e)
+          rom.add(extractByteFromDec(piece[2]))
+          inc pc
         else:
           msb.setMask(0x07+shift)
           rom.add(msb)
@@ -152,6 +159,10 @@ proc assemble*(code: string): seq[byte] =
           if piece[2].startsWith("$"):
             rom.add(byte 0xc6)
             rom.add(extractByte(piece[2]))
+            inc pc
+          elif piece[2].startsWith("."):
+            rom.add(byte 0xc6)
+            rom.add(extractByteFromDec(piece[2]))
             inc pc
           else:
             rom.add(byte 0x87)
@@ -187,6 +198,10 @@ proc assemble*(code: string): seq[byte] =
           rom.add(byte 0xd6)
           rom.add(extractByte(piece[2]))
           inc pc
+        elif piece[2].startsWith("."):
+          rom.add(byte 0xd6)
+          rom.add(extractByteFromDec(piece[2]))
+          inc pc
         else:
           rom.add(byte 0x97)
 
@@ -212,6 +227,10 @@ proc assemble*(code: string): seq[byte] =
         if piece[2].startsWith("$"):
           rom.add(byte 0xe6)
           rom.add(extractByte(piece[2]))
+          inc pc
+        elif piece[2].startsWith("."):
+          rom.add(byte 0xe6)
+          rom.add(extractByteFromDec(piece[2]))
           inc pc
         else:
           rom.add(byte 0xa7)
@@ -239,6 +258,10 @@ proc assemble*(code: string): seq[byte] =
           rom.add(byte 0xee)
           rom.add(extractByte(piece[2]))
           inc pc
+        elif piece[2].startsWith("."):
+          rom.add(byte 0xee)
+          rom.add(extractByteFromDec(piece[2]))
+          inc pc
         else:
           rom.add(byte 0xaf)
 
@@ -264,6 +287,10 @@ proc assemble*(code: string): seq[byte] =
         if piece[2].startsWith("$"):
           rom.add(byte 0xf6)
           rom.add(extractByte(piece[2]))
+          inc pc
+        elif piece[2].startsWith("."):
+          rom.add(byte 0xf6)
+          rom.add(extractByteFromDec(piece[2]))
           inc pc
         else:
           rom.add(byte 0xb7)
@@ -291,6 +318,10 @@ proc assemble*(code: string): seq[byte] =
         if piece[2].startsWith("$"):
           rom.add(byte 0xfe)
           rom.add(extractByte(piece[2]))
+          inc pc
+        elif piece[2].startsWith("."):
+          rom.add(byte 0xfe)
+          rom.add(extractByteFromDec(piece[2]))
           inc pc
         else:
           rom.add(byte 0xbf)
