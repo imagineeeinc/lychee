@@ -1,4 +1,4 @@
-ld a #80
+ld a $80
 ld h a
 ld a $02
 ld l a

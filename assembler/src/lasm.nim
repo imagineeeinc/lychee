@@ -14,3 +14,4 @@ when isMainModule:
   let args = docopt(doc, version = "0.1.0", help=true)
   if args["<file>"]:
     let code = readFile($args["<file>"])
+    discard assemble(code)
