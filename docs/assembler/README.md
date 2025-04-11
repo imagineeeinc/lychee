@@ -11,6 +11,7 @@ Lychee assembly (and the instruction set) is *highly* similar to Gameboy assembl
 		- [Syntax](#syntax)
 		- [Symbols](#symbols)
 		- [Sections](#sections)
+		- [Opcodes](#opcodes)
 
 ## Assembler (LASM)
 The lychee assembler (lasm) is a very simple assembler which simply translates the assembly code to machine code that the CPU will understand.
@@ -60,3 +61,6 @@ Lychee assembly uses specialised symbols to to denote data types.
 
 ### Sections
 Sections are placed before a piece of code and is useful for the jump instruction, define a section by adding tag name followed by a `:`. Anything below that tag will be ran. Do not if you don't move to somewhere else, the CPU will just move to the next section. And this can be used strategically by placing sections next to each other for a planned behaviour.
+
+### Opcodes
+To learn more about the avalible opcodes read [`/spec/opcode`](../spec/opcode.md). If you want to learn more about how some of the opcodes work, there is no documentation on it as od right now, however you can read about how some of them work on the [rgbds cpu refrence](https://rgbds.gbdev.io/docs/v0.7.0/gbz80.7), as the instruction set is similar to the gameboy.

@@ -20,6 +20,7 @@ Roms are either written in raw hex, using a hex editor (example roms in `/exampl
 And more info on the assembler at [`docs/assembler`](docs/assembler)
 
 ## Usage
+To use the desktop app for emulation and debugging, read the [`docs/desktop`](docs/desktop).
 ### Compilation
 #### Compiling the Emulator
 Make sure the [Nim compiler and Nimble package manager](https://nim-lang.org/) is installed.
@@ -30,7 +31,7 @@ git clone https://github.com/imagineeeinc/lychee.git
 cd lychee
 
 # Debug (Run)
-nimble debug
+nimble debug -- ./rom
 
 # Build release
 nimble release
@@ -47,5 +48,5 @@ nimble build
 ./lasm.exe examples/loopchars.asm ../rom
 # Then run it in lychee
 cd ..
-nimble debug
+nimble debug -- ./rom
 ```
