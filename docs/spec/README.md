@@ -81,7 +81,7 @@ The CPU uses a heavily inspired version of the GameBoy instruction set. This ver
 Lychee Assembly, the custom assembly dialect. This version include some syntax specifics. And an official assembler is available.
 
 ## Memory
-Lychee used memory-mapped memory and I/O. This means all that the ROM, Work RAM, Character display memory and I/O all live under the same memory address range.
+Lychee uses memory-mapped memory and I/O. This means all that the ROM, Work RAM, Character display memory and I/O all live under the same memory address range.
 
 Lychee uses a 16 bit address bus, thus 65536 possible address locations. This is then split between the different parts of the machine.
 1. ($0000-$8000) 32 kb: ROM
@@ -90,7 +90,7 @@ Lychee uses a 16 bit address bus, thus 65536 possible address locations. This is
 4. ($9781-$9999) 536 bytes: Reserved stack ram
 5. ($A000 - $FFFF) 24 kb: Work RAM
 
-###+ Character display memory
+### Character display memory
 Between `$8001`-`$9680` is where all the character data is stored. For each address that stores the character, the adjacent memory address is the character's colour data.
 
 As the address goes up we move along the from left to right, once we reach the end of a line we loop back to the left of the next line.
