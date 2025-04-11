@@ -14,16 +14,17 @@ type Flags = ref object
   h*: bool # half carry
 
 type Register = ref object
-  a*: byte  # Accumulator [Wriable]              (Accu)
-  f*: byte  # Flags [Non-writable]               (F) -> [https://gbdev.io/pandocs/CPU_Registers_and_Flags.html#the-flags-register-lower-8-bits-of-af-register]
+  a*: byte  # Accumulator [Wriable]                (Accu)
+  f*: byte  # Flags [Non-writable]                 (F) -> [https://gbdev.io/pandocs/CPU_Registers_and_Flags.html#the-flags-register-lower-8-bits-of-af-register]
   b*: byte  # General purpose registers [Wriable] (GEr)
   c*: byte  # General purpose registers [Wriable] (GEr)
   d*: byte  # General purpose registers [Wriable] (GEr)
   e*: byte  # General purpose registers [Wriable] (GEr)
   h*: byte  # General purpose registers [Wriable] (GEr)
   l*: byte  # General purpose registers [Wriable] (GEr)
-  pc*: int # Program counter [Writable]         (PC)
-  sp*: int # Stack pointer [Non-writable]       (SP)
+  pc*: int # Program counter [Writable]           (PC)
+  sp*: int # Stack pointer [Non-writable]         (SP)
+  timer*: int # Timer [Writable]
 
 
 type LycheeEmulator* = ref object
@@ -489,6 +490,14 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x0A:# ld a16, a
       self.ram[a16] = self.r.a
       inc(self.r.pc, 2)
+    of 0x03:# ld Timer, a
+      self.r.timer = int self.r.a
+      if self.r.timer == 0x00:
+        self.f.z = true
+    of 0x04:# ld a, Timer
+      self.r.a = byte self.r.timer
+      if self.r.a == 0x00:
+        self.f.z = true
     else:
       discard
   of 0x0F:
