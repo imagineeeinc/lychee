@@ -7,12 +7,11 @@ Lychee is a simple and bare bones emulator for a fictional computer with an inst
 Check out the `docs/specs` folder for more on opcodes and specification.
 
 ## ROMS
-Roms are currently written in raw hex (no assembler right now), written using a hex editor you can write down opcodes in a file.
+Roms are either written in raw hex, using a hex editor. Or the official assembler found in the `/assembler` directory.
 
-example rom:
-```
-3e 0a 47 3e 14 90 c3 00 00
-```
+Examples are found in `/assembler/examples`.
+
+And more info on the assembler at [`assembler/docs`](assembler/docs/)
 
 ## Compilation
 Make sure the Nim compiler and Nimble package manager is installed.
@@ -34,4 +33,18 @@ nimble debug
 
 # Build release
 nimble release
+```
+### Compiling the assembler
+```bash
+# cd into the assembler
+cd assembler
+nimble build
+
+# Try the example project
+./lasm examples/loopchars.asm ../rom
+# For windows
+./lasm.exe examples/loopchars.asm ../rom
+# Then run it in lychee
+cd ..
+nimble debug
 ```
