@@ -64,7 +64,7 @@ tb.setForegroundColor(fgBlack, true)
 tb.drawRect(0, 0, 11, 9)
 tb.drawHorizLine(2, 9, 7, doubleStyle=true)
 tb.drawRect(12, 0, 12+11, 9)
-tb.drawHorizLine(14, 21, 2, doubleStyle=true)
+tb.drawHorizLine(14, 21, 3, doubleStyle=true)
 
 # lychee setup
 const color_table = [
@@ -94,6 +94,7 @@ let defaultclockhz = initDuration(microseconds=int(1000000/500))
 var clockhz = defaultclockhz
 var sixtylast = getMonoTime()
 var clocklast = getMonoTime()
+var paused: bool = false
 
 proc lycheeDraw(emu: LycheeEmulator) =
   sdtx.font(0)
@@ -112,8 +113,7 @@ proc lycheeDraw(emu: LycheeEmulator) =
         sdtx.putc(c.char)
     sdtx.crlf()
 
-
-proc lycheeUpdate(emu: LycheeEmulator) =
+proc runUpdate(emu: LycheeEmulator) =
   let cur = getMonoTime()
   if cur - sixtylast > sixtyhz:
     # timers
@@ -124,6 +124,9 @@ proc lycheeUpdate(emu: LycheeEmulator) =
       # TODO: Make a clean exit
       exitProc()
     clocklast = getMonoTime()
+
+proc lycheeUpdate(emu: LycheeEmulator) =
+  if paused == false: runUpdate(emu)
 
   var key = getKey()
   case key
@@ -138,6 +141,13 @@ proc lycheeUpdate(emu: LycheeEmulator) =
       debug = false
       clockhz = defaultclockhz
       tb.write(13, 1, resetStyle, "Debug: ", fgRed, "Off")
+  of Key.Space:
+    paused = not paused
+    tb.write(13, 2, resetStyle, "Paused:", fgGreen, if paused: "On " else: "Off")
+  of Key.N:
+    if paused:
+      runUpdate(emu)
+
   else:
     discard
   tb.write(2, 1, resetStyle, "A: ", fgGreen, emu.r.a.toHex)
@@ -147,7 +157,8 @@ proc lycheeUpdate(emu: LycheeEmulator) =
   tb.write(2, 5, resetStyle, "PC: ", fgGreen, toHex(emu.r.pc, 4))
   tb.write(2, 6, resetStyle, "SP: ", fgGreen, toHex(emu.r.sp, 4))
   tb.write(2, 8, resetStyle, "MBR: ", fgGreen, emu.program[emu.r.pc])
-  tb.write(13, 3, resetStyle, "Z: ", fgGreen, if emu.f.z: "1" else: "0")
+  tb.write(13, 4, resetStyle, "Z: ", fgGreen, if emu.f.z: "1" else: "0")
+  tb.write(13, 5, resetStyle, "C: ", fgGreen, if emu.f.c: "1" else: "0")
 
   tb.display()
 
