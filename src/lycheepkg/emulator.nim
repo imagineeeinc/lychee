@@ -1,4 +1,4 @@
-import strutils
+import strutils, system
 
 const mem_size: int = 24576 # 24kb
 const vmem_size: int = 5760 # 5.6kb
@@ -70,6 +70,7 @@ proc cycle*(self: LycheeEmulator): int =
   inc self.r.pc
 
   self.f.z = false
+  self.f.c = false
 
   # Constants
   let hl = fromHex[int](toHex(parseHexInt(self.r.h.toHex & self.r.l.toHex) - mem_offset))
@@ -252,35 +253,59 @@ proc cycle*(self: LycheeEmulator): int =
   of 0x08:
     case lsn
     of 0x00: # add a, b
+      let temp = self.r.a
       self.r.a += self.r.b
+      if self.r.a <= temp:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x01: # add a, c
+      let temp = self.r.a
       self.r.a += self.r.c
+      if self.r.a <= temp:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x02: # add a, d
+      let temp = self.r.a
       self.r.a += self.r.d
+      if self.r.a <= temp:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x03: # add a, e
+      let temp = self.r.a
       self.r.a += self.r.e
+      if self.r.a <= temp:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x04: # add a, h
+      let temp = self.r.a
       self.r.a += self.r.h
+      if self.r.a <= temp:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x05: # add a, l
+      let temp = self.r.a
       self.r.a += self.r.l
+      if self.r.a <= temp:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x06: # add a, (hl)
+      let temp = self.r.a
       self.r.a += self.workram[hl]
+      if self.r.a <= temp:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x07: # add a, a
+      let temp = self.r.a
       self.r.a += self.r.a
+      if self.r.a <= temp:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x08:
@@ -304,31 +329,52 @@ proc cycle*(self: LycheeEmulator): int =
   of 0x09:
     case lsn
     of 0x00: # sub b
+      let temp = self.r.a
       self.r.a -= self.r.b
+      if temp < self.r.b:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x01: # sub c
+      let temp = self.r.a
       self.r.a -= self.r.c
+      if temp < self.r.c:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x02: # sub d
+      let temp = self.r.a
       self.r.a -= self.r.d
+      if temp < self.r.d:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x03: # sub e
+      let temp = self.r.a
       self.r.a -= self.r.e
+      if temp < self.r.e:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x04: # sub h
+      let temp = self.r.a
       self.r.a -= self.r.h
+      if temp < self.r.h:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x05: # sub l
+      let temp = self.r.a
       self.r.a -= self.r.l
+      if temp < self.r.l:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x06: # sub (hl)
+      let temp = self.r.a
       self.r.a -= self.workram[hl]
+      if temp < self.workram[hl]:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
     of 0x07: # sub a
@@ -358,7 +404,10 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x03:# jp a16
       self.r.pc = fromHex[int](program[pc+1] & program[pc+2])
     of 0x06:# add a, d8
+      let temp = self.r.a
       self.r.a += fromHex[byte](program[pc+1])
+      if self.r.a <= temp:
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
       inc self.r.pc
@@ -367,7 +416,10 @@ proc cycle*(self: LycheeEmulator): int =
   of 0x0D:
     case lsn
     of 0x06: # sub a, d8
+      let temp = self.r.a
       self.r.a -= fromHex[byte](program[pc+1])
+      if temp < fromHex[byte](program[pc+1]):
+        self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
       inc self.r.pc
