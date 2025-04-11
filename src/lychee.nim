@@ -13,7 +13,7 @@ Options:
   --paused      Launch paused, good for steping instruction by instruction.
 """
 
-import std/[strutils, monotimes, times]
+import std/[strutils, monotimes, times, locks]
 
 import illwill
 import docopt
@@ -56,6 +56,7 @@ proc cleanup() {.cdecl.} =
   sg.shutdown()
   illwillDeinit()
   showCursor()
+  quit(0)
 
 # proc printFont(fontIndex: int32, title: cstring, r: uint8, g: uint8, b: uint8) =
 #   sdtx.font(fontIndex)
@@ -109,7 +110,7 @@ const color_table = [
 var debug: bool = if args["-d"]: true else: false
 let sixtyhz = initDuration(milliseconds=int(1000/60))
 let debugclockhz = initDuration(seconds=1)
-let defaultclockhz = initDuration(microseconds=int(1000000/500))
+let defaultclockhz = initDuration(microseconds=int(1000000/100000))
 var clockhz = if args["-d"]: debugclockhz else: defaultclockhz
 var sixtylast = getMonoTime()
 var clocklast = getMonoTime()
@@ -145,8 +146,6 @@ proc runUpdate(emu: LycheeEmulator) =
     clocklast = getMonoTime()
 
 proc lycheeUpdate(emu: LycheeEmulator) =
-  if paused == false: runUpdate(emu)
-
   var key = getKey()
   case key
   of Key.None: discard
@@ -203,6 +202,13 @@ when isMainModule:
     sg.commit()
 
     lychee_update(emu)
+  var t: Thread[tuple[emu: ptr LycheeEmulator, paused: ptr bool]]
+  proc looping(parms: tuple[emu: ptr LycheeEmulator, paused: ptr bool]) {.thread.} =
+    while true:
+      if parms.paused[] == false:
+        runUpdate(parms.emu[])
+  createThread(t, looping, (addr emu, addr paused))
+  
 
   sapp.run(sapp.Desc(
     initCb: init,
@@ -216,3 +222,4 @@ when isMainModule:
     icon: IconDesc(sokol_default: true),
     logger: sapp.Logger(fn: slog.fn),
   ))
+  joinThread(t)
