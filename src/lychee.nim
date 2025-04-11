@@ -1,6 +1,6 @@
 import std/[strutils, monotimes, times]
+
 import illwill
-import lycheepkg/emulator
 
 import sokol/log as slog
 import sokol/gfx as sg
@@ -8,10 +8,13 @@ import sokol/app as sapp
 import sokol/debugtext as sdtx
 import sokol/glue as sglue
 
+import lycheepkg/emulator
+import fileLoading
+
 # sokol setup
 const passAction = PassAction(
     colors: [
-      ColorAttachmentAction(loadAction: loadActionClear, clearValue: (0, 0.125, 0.25, 1))
+      ColorAttachmentAction(loadAction: loadActionClear, clearValue: (0, 0, 0, 1))
     ]
   )
 
@@ -34,7 +37,6 @@ proc cleanup() {.cdecl.} =
   sg.shutdown()
   illwillDeinit()
   showCursor()
-  quit(0)
 
 proc printFont(fontIndex: int32, title: cstring, r: uint8, g: uint8, b: uint8) =
   sdtx.font(fontIndex)
@@ -64,31 +66,24 @@ tb.drawHorizLine(2, 9, 7, doubleStyle=true)
 tb.drawRect(12, 0, 12+11, 9)
 
 # lychee setup
-proc chunkString(input: string): seq[string] =
-  result = @[]
-  var i = 0
-  while i < len(input):
-    var chunk: string
-    if i + 1 < len(input):
-      chunk = input[i..i+1]
-    else:
-      chunk = input[i..i]
-    result.add(chunk)
-    i += 2
-
-proc readRomFile(filePath: string): seq[string] =
-  var
-    f: File
-    content: string# seq[byte]
-  try:
-    f = open(filePath, fmRead)
-    content = f.readAll()
-    f.close()
-  except IOError:
-    echo "Error reading the file: ", filePath
-    quit(1)
-
-  return chunkString(content.toHex)
+const color_table = [
+  [0x1a, 0x1c, 0x2c],
+  [0x5d, 0x27, 0x5d],
+  [0xb1, 0x3e, 0x53],
+  [0xef, 0x7d, 0x57],
+  [0xff, 0xcd, 0x75],
+  [0xa7, 0xf0, 0x70],
+  [0x38, 0xb7, 0x64],
+  [0x25, 0x71, 0x79],
+  [0x29, 0x36, 0x6f],
+  [0x3b, 0x5d, 0xc9],
+  [0x41, 0xa6, 0xf6],
+  [0x73, 0xef, 0xf7],
+  [0xf4, 0xf4, 0xf4],
+  [0x94, 0xb0, 0xc2],
+  [0x56, 0x6c, 0x86],
+  [0x33, 0x3c, 0x57]
+]
 
 # lychee clock
 var debug: bool = false
@@ -99,13 +94,33 @@ var clockhz = defaultclockhz
 var sixtylast = getMonoTime()
 var clocklast = getMonoTime()
 
+proc lycheeDraw(emu: LycheeEmulator) =
+  sdtx.font(0)
+  sdtx.color3b(0x79, 0x86, 0xcb)
+  for y in 0..44:
+    for x in 0..63:
+      let pos = (x + y)*2
+      var c: int = fromHex[int](emu.workram[pos].toHex)
+      let color = emu.workram[pos+1]
+      # Most significant nibble
+      let msn = color shr 4
+      # Least significant nibble
+      let lsn = color and 0x0f
+      if c >= 32:
+        sdtx.putc(c.char)
+    sdtx.crlf()
+
+
 proc lycheeUpdate(emu: LycheeEmulator) =
   let cur = getMonoTime()
   if cur - sixtylast > sixtyhz:
     # timers
     sixtylast = getMonoTime()
   if cur - clocklast > clockhz:
-    discard emu.cycle()
+    let exit_code = emu.cycle()
+    if exit_code == 1:
+      # TODO: Make a clean exit
+      exitProc()
     clocklast = getMonoTime()
 
   var key = getKey()
@@ -145,9 +160,10 @@ when isMainModule:
     # set virtual canvas size to half display size so that
     # glyphs are 16x16 display pixels
     sdtx.canvas(sapp.widthf()*0.5, sapp.heightf()*0.5)
-    sdtx.origin(0, 2)
+    sdtx.origin(0, 0)
     sdtx.home()
-    print_font(0, "C64:\n",         0x79, 0x86, 0xcb)
+    #print_font(0, "C64:\n",         0x79, 0x86, 0xcb)
+    lycheeDraw(emu)
 
     sg.beginPass(Pass(action: passAction, swapchain: sglue.swapchain()))
     sdtx.draw()
