@@ -3,7 +3,7 @@
   - 8 bit instructions
   - 16 bit address width
 - Display
-  - 80x60 character display (4800 characters on screen)
+  - 64x45 character display (2880 characters on screen)
   - ascii characters + extras
   - 4 bit colour (16 colours)
   - foreground colour and background colour

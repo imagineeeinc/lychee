@@ -1,6 +1,7 @@
 import strutils
 
-const mem_size: int = 22528
+const mem_size: int = 24576 # 24kb
+const vmem_size: int = 5760 # 5.6kb
 
 type Register = ref object
   a*: byte  # Accumulator [Wriable]              (Accu)
@@ -15,10 +16,11 @@ type Register = ref object
   sp*: int # Stack pointer [Non-writable]       (SP)
 
 
-type LycheeEmulator = ref object
+type LycheeEmulator* = ref object
   r*: Register
   program*: seq[string]
   workram*: array[mem_size, byte]
+  vram*: array[vmem_size, byte]
 
 
 proc initLycheeEmulator*(): LycheeEmulator =
