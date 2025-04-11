@@ -3,6 +3,7 @@ import strutils, system
 const mem_size: int = 24576 # 24kb
 const vmem_size: int = 5760 # 5.6kb
 const mem_offset*: int = 0x8001
+const ram_size*: int = 64 * 1024
 
 const workmem_start: int = 0xA000
 
@@ -29,7 +30,7 @@ type LycheeEmulator* = ref object
   r*: Register
   f*: Flags
   program*: seq[string]
-  workram*: array[mem_size+vmem_size, byte]
+  ram*: array[ram_size, byte]
 
 
 proc initLycheeEmulator*(): LycheeEmulator =
@@ -57,11 +58,14 @@ proc initLycheeEmulator*(): LycheeEmulator =
 
 proc loadRom*(self: LycheeEmulator, rom: seq[string]) =
   self.program = rom
+  for pos in 0..<len(self.program):
+    let instruction = self.program[pos]
+    self.ram[pos] = fromHex[byte](instruction)
+
 
 proc cycle*(self: LycheeEmulator): int =
   let pc = self.r.pc
-  let program = self.program
-  let mar = fromHex[byte](program[pc])
+  let mar = self.ram[pc]
   # Most significant nibble
   let msn = mar shr 4
   # Least significant nibble
@@ -73,8 +77,8 @@ proc cycle*(self: LycheeEmulator): int =
   self.f.c = false
 
   # Constants
-  let hl = fromHex[int](toHex(parseHexInt(self.r.h.toHex & self.r.l.toHex) - mem_offset))
-  let a16 = fromHex[int](toHex(parseHexInt(program[pc+1] & program[pc+2]) - mem_offset))
+  let hl = fromHex[int](toHex(parseHexInt(self.r.h.toHex & self.r.l.toHex)))
+  let a16 = fromHex[int](self.ram[pc+1].toHex & self.ram[pc+2].toHex)
 
   case msn
   of 0x00:
@@ -86,11 +90,11 @@ proc cycle*(self: LycheeEmulator): int =
   of 0x03:
     case lsn
     of 0x04:# inc (hl)
-      inc self.workram[hl]
+      inc self.ram[hl]
       if self.r.a == 0x00:
         self.f.z = true
     of 0x05:# dec (hl)
-      dec self.workram[hl]
+      dec self.ram[hl]
       if self.r.a == 0x00:
         self.f.z = true
     of 0x0C:# inc a
@@ -102,7 +106,7 @@ proc cycle*(self: LycheeEmulator): int =
       if self.r.a == 0x00:
         self.f.z = true
     of 0x0E:# ld a, d8
-      self.r.a = fromHex[byte](program[pc+1])
+      self.r.a = self.ram[pc+1]
       inc self.r.pc
     else:
       discard
@@ -121,7 +125,7 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x05:# ld b, l
       self.r.b = self.r.l
     of 0x06:# ld b, (hl)
-      self.r.b = self.workram[hl]
+      self.r.b = self.ram[hl]
     of 0x07:# ld b, a
       self.r.b = self.r.a
     of 0x08:# ld c, b
@@ -137,7 +141,7 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x0D:# ld c, l
       self.r.c = self.r.l
     of 0x0E:# ld c, (hl)
-      self.r.c = self.workram[hl]
+      self.r.c = self.ram[hl]
     of 0x0F:# ld c, a
       self.r.c = self.r.a
     else:
@@ -157,7 +161,7 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x05:# ld d, l
       self.r.d = self.r.l
     of 0x06:# ld d, (hl)
-      self.r.d = self.workram[hl]
+      self.r.d = self.ram[hl]
     of 0x07:# ld d, a
       self.r.d = self.r.a
     of 0x08:# ld e, b
@@ -173,7 +177,7 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x0D:# ld e, l
       self.r.e = self.r.l
     of 0x0E:# ld e, (hl)
-      self.r.e = self.workram[hl]
+      self.r.e = self.ram[hl]
     of 0x0F:# ld e, a
       self.r.e = self.r.a
     else:
@@ -193,7 +197,7 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x05:# ld h, l
       self.r.h = self.r.l
     of 0x06:# ld h, (hl)
-      self.r.h = self.workram[hl]
+      self.r.h = self.ram[hl]
     of 0x07:# ld h, a
       self.r.h = self.r.a
     of 0x08:# ld l, b
@@ -209,7 +213,7 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x0D:# ld l, l
       self.r.l = self.r.l
     of 0x0E:# ld l, (hl)
-      self.r.l = self.workram[hl]
+      self.r.l = self.ram[hl]
     of 0x0F:# ld l, a
       self.r.l = self.r.a
     else:
@@ -217,21 +221,21 @@ proc cycle*(self: LycheeEmulator): int =
   of 0x07:
     case lsn
     of 0x00:# ld (hl), b
-      self.workram[hl] = self.r.b
+      self.ram[hl] = self.r.b
     of 0x01:# ld (hl), c
-      self.workram[hl] = self.r.c
+      self.ram[hl] = self.r.c
     of 0x02:# ld (hl), d
-      self.workram[hl] = self.r.d
+      self.ram[hl] = self.r.d
     of 0x03:# ld (hl), e
-      self.workram[hl] = self.r.e
+      self.ram[hl] = self.r.e
     of 0x04:# ld (hl), h
-      self.workram[hl] = self.r.h
+      self.ram[hl] = self.r.h
     of 0x05:# ld (hl), l
-      self.workram[hl] = self.r.l
+      self.ram[hl] = self.r.l
     of 0x06:# halt
       return 1
     of 0x07:# ld (hl), a
-      self.workram[hl] = self.r.a
+      self.ram[hl] = self.r.a
     of 0x08:# ld a, b
       self.r.a = self.r.b
     of 0x09:# ld a, c
@@ -245,7 +249,7 @@ proc cycle*(self: LycheeEmulator): int =
     of 0x0D:# ld a, l
       self.r.a = self.r.l
     of 0x0E:# ld a, (hl)
-      self.r.a = self.workram[hl]
+      self.r.a = self.ram[hl]
     of 0x0F:# ld a, a
       self.r.a = self.r.a
     else:
@@ -296,7 +300,7 @@ proc cycle*(self: LycheeEmulator): int =
         self.f.z = true
     of 0x06: # add a, (hl)
       let temp = self.r.a
-      self.r.a += self.workram[hl]
+      self.r.a += self.ram[hl]
       if self.r.a <= temp:
         self.f.c = true
       if self.r.a == 0x00:
@@ -372,8 +376,8 @@ proc cycle*(self: LycheeEmulator): int =
         self.f.z = true
     of 0x06: # sub (hl)
       let temp = self.r.a
-      self.r.a -= self.workram[hl]
-      if temp < self.workram[hl]:
+      self.r.a -= self.ram[hl]
+      if temp < self.ram[hl]:
         self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
@@ -402,10 +406,10 @@ proc cycle*(self: LycheeEmulator): int =
   of 0x0C:
     case lsn
     of 0x03:# jp a16
-      self.r.pc = fromHex[int](program[pc+1] & program[pc+2])
+      self.r.pc = a16#fromHex[int](self.ram[pc+1].toHex & self.ram[pc+2].toHex)
     of 0x06:# add a, d8
       let temp = self.r.a
-      self.r.a += fromHex[byte](program[pc+1])
+      self.r.a += self.ram[pc+1]
       if self.r.a <= temp:
         self.f.c = true
       if self.r.a == 0x00:
@@ -417,8 +421,8 @@ proc cycle*(self: LycheeEmulator): int =
     case lsn
     of 0x06: # sub a, d8
       let temp = self.r.a
-      self.r.a -= fromHex[byte](program[pc+1])
-      if temp < fromHex[byte](program[pc+1]):
+      self.r.a -= self.ram[pc+1]
+      if temp < self.ram[pc+1]:
         self.f.c = true
       if self.r.a == 0x00:
         self.f.z = true
@@ -428,14 +432,14 @@ proc cycle*(self: LycheeEmulator): int =
   of 0x0E:
     case lsn
     of 0x0A:# ld a16, a
-      self.workram[a16] = self.r.a
+      self.ram[a16] = self.r.a
       inc(self.r.pc, 2)
     else:
       discard
   of 0x0F:
     case lsn
     of 0x0A:# ld a, a16
-      self.r.a = self.workram[a16]
+      self.r.a = self.ram[a16]
       inc(self.r.pc, 2)
     else:
       discard

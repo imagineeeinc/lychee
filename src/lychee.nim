@@ -101,8 +101,8 @@ proc lycheeDraw(emu: LycheeEmulator) =
   for y in 0..44:
     for x in 0..63:
       let pos = (x + y)*2
-      var c: int = fromHex[int](emu.workram[pos].toHex)
-      let color = emu.workram[pos+1]
+      var c: int = fromHex[int](emu.ram[pos+mem_offset].toHex)
+      let color = emu.ram[pos+mem_offset+1]
       # Most significant nibble
       let msn = color shr 4
       # Least significant nibble
@@ -156,7 +156,7 @@ proc lycheeUpdate(emu: LycheeEmulator) =
   tb.write(2, 4, resetStyle, "HL: ", fgGreen, emu.r.h.toHex, emu.r.l.toHex)
   tb.write(2, 5, resetStyle, "PC: ", fgGreen, toHex(emu.r.pc, 4))
   tb.write(2, 6, resetStyle, "SP: ", fgGreen, toHex(emu.r.sp, 4))
-  tb.write(2, 8, resetStyle, "MBR: ", fgGreen, emu.program[emu.r.pc])
+  tb.write(2, 8, resetStyle, "MBR: ", fgGreen, emu.ram[emu.r.pc].toHex)
   tb.write(13, 4, resetStyle, "Z: ", fgGreen, if emu.f.z: "1" else: "0")
   tb.write(13, 5, resetStyle, "C: ", fgGreen, if emu.f.c: "1" else: "0")
 
