@@ -163,7 +163,6 @@ when isMainModule:
     sdtx.canvas(sapp.widthf()*0.5, sapp.heightf()*0.5)
     sdtx.origin(0, 0)
     sdtx.home()
-    #print_font(0, "C64:\n",         0x79, 0x86, 0xcb)
     lycheeDraw(emu)
 
     sg.beginPass(Pass(action: passAction, swapchain: sglue.swapchain()))
