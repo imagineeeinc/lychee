@@ -10,6 +10,7 @@ Lychee assembly (and the instruction set) is *highly* similar to Gameboy assembl
 	- [Assembly Language](#assembly-language)
 		- [Syntax](#syntax)
 		- [Symbols](#symbols)
+		- [Addressing](#addressing)
 		- [Sections](#sections)
 		- [Opcodes](#opcodes)
 
@@ -58,9 +59,15 @@ Opcode
 Lychee assembly uses specialised symbols to to denote data types.
 - `$00` (Hex): A `$` followed by numeric values represents a hex value.
 - `&name` (Section Names): A `&` followed by a tag represents a position in the rom, useful for jumps.
+- `(hl)` (Indirect): An `(` followed by `hl` followed by a `)` represents an indirect value. Means use the value in `hl` as the address to fetch from.
+
+### Addressing
+- Immediate: The value is passed directly to the instruction, for example `ld a $00` will load the value `0x00` into the accumulator.
+- Direct: The value is fetched from the address specified in the instruction, for example `ld a b` will load the value at address `b` into the accumulator.
+- Indirect: The value is fetched from the address specified in the address in the instructions, for example `ld a (hl)` will go to `hl` and use the value stored there as an address and fetch the value from that address.
 
 ### Sections
 Sections are placed before a piece of code and is useful for the jump instruction, define a section by adding tag name followed by a `:`. Anything below that tag will be ran. Do not if you don't move to somewhere else, the CPU will just move to the next section. And this can be used strategically by placing sections next to each other for a planned behaviour.
 
 ### Opcodes
-To learn more about the available opcodes read [`/spec/opcode`](../spec/opcode.md). If you want to learn more about how some of the opcodes work, there is no documentation on it as of right now, however you can read about how some of them work on the [rgbds cpu reference](https://rgbds.gbdev.io/docs/v0.7.0/gbz80.7), as the instruction set is similar to the Gameboy.
+To learn more about the available opcodes read [`/spec/opcode`](../spec/opcode.md). If you want to learn more about how some of the opcodes work, there is no documentation on it as of right now, however you can read about how some of them work on the [rgbds cpu reference](https://rgbds.gbdev.io/docs/v0.9.1/gbz80.7), as the instruction set is similar to the Gameboy.

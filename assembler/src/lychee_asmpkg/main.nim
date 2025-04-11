@@ -1,6 +1,12 @@
 import std/[strutils, bitops]
 import std/tables
 
+proc extractByte(code: string): byte =
+  return fromHex[byte](code[1..^1])
+
+proc extract2Bytes(code: string): array[2, byte] =
+  return [fromHex[byte](code[1..2]), fromHex[byte](code[3..^1])]
+
 proc assemble*(code: string): seq[byte] =
   let codeTree: seq[string] = code.splitLines()
   var rom: seq[byte] = newSeq[byte]()
@@ -10,23 +16,33 @@ proc assemble*(code: string): seq[byte] =
   for n in 0..<len(codeTree):
     let line = codeTree[n]
     let piece = line.split(" ")
+
+    # Comment
     if piece[0].toLowerAscii().startsWith("#"):
       continue
+
     case piece[0].toLowerAscii()
     of "nop":
       rom.add(byte 0x00)
+
     of "halt":
       rom.add(byte 0x76)
+
     of "inc":
       case piece[1].toLowerAscii()
+      # inc (hl)
       of "(hl)":
         rom.add(byte 0x34)
+      # inc a
       of "a":
         rom.add(byte 0x3c)
+
     of "dec":
       case piece[1].toLowerAscii()
+      # dec (hl)
       of "(hl)":
         rom.add(byte 0x35)
+      # dec a
       of "a":
         rom.add(byte 0x3d)
     of "ld":
@@ -63,24 +79,31 @@ proc assemble*(code: string): seq[byte] =
       else:
         if piece[1].startsWith("$"):
           direct = true
-          direct_value = [fromHex[byte](piece[1][1..2]), fromHex[byte](piece[1][3..^1])]
+          direct_value = extract2Bytes(piece[1])
 
       case piece[2].toLowerAscii()
       of "b":
-        rom.add(bitor[byte](msb, 0x00+shift))
+        msb.setMask(0x00+shift)
+        rom.add(msb)
       of "c":
-        rom.add(bitor[byte](msb, 0x01+shift))
+        msb.setMask(0x01+shift)
+        rom.add(msb)
       of "d":
-        rom.add(bitor[byte](msb, 0x02+shift))
+        msb.setMask(0x02+shift)
+        rom.add(msb)
       of "e":
-        rom.add(bitor[byte](msb, 0x03+shift))
+        msb.setMask(0x03+shift)
+        rom.add(msb)
       of "h":
-        rom.add(bitor[byte](msb, 0x04+shift))
+        msb.setMask(0x04+shift)
+        rom.add(msb)
       of "l":
-        rom.add(bitor[byte](msb, 0x05+shift))
+        msb.setMask(0x05+shift)
+        rom.add(msb)
       of "(hl)":
         if not hl:
-          rom.add(bitor[byte](msb, 0x06+shift))
+          msb.setMask(0x06+shift)
+        rom.add(msb)
       of "a":
         if msb == byte 0xe0:
           rom.add(byte 0xe3)
@@ -91,19 +114,23 @@ proc assemble*(code: string): seq[byte] =
           inc pc
           inc pc
         else:
-          rom.add(bitor[byte](msb, 0x07+shift))
+          msb.setMask(0x07+shift)
+          rom.add(msb)
       of "timer":
         if msb == byte 0x70:
           rom.add(byte 0xe4)
       else:
         if piece[2].startsWith("$"):
           rom.add(byte 0x3e)
-          rom.add(fromHex[byte](piece[2][1..^1]))
+          rom.add(extractByte(piece[2]))
           inc pc
         else:
-          rom.add(bitor[byte](msb, 0x07+shift))
+          msb.setMask(0x07+shift)
+          rom.add(msb)
+
     of "add":
       if piece[1].toLowerAscii() != "hl":
+        # 8 Bit addition
         case piece[2].toLowerAscii()
         of "b":
           rom.add(byte 0x80)
@@ -124,10 +151,11 @@ proc assemble*(code: string): seq[byte] =
         else:
           if piece[2].startsWith("$"):
             rom.add(byte 0xc6)
-            rom.add(fromHex[byte](piece[2][1..^1]))
+            rom.add(extractByte(piece[2]))
             inc pc
           else:
             rom.add(byte 0x87)
+      # 16 Bit addition
       elif piece[1].toLowerAscii() == "hl":
         if piece[2].toLowerAscii() == "bc":
           rom.add(byte 0x09)
@@ -135,6 +163,7 @@ proc assemble*(code: string): seq[byte] =
           rom.add(byte 0x19)
         elif piece[2].toLowerAscii() == "hl":
           rom.add(byte 0x29)
+
     of "sub":
       case piece[2].toLowerAscii()
       of "b":
@@ -156,10 +185,11 @@ proc assemble*(code: string): seq[byte] =
       else:
         if piece[2].startsWith("$"):
           rom.add(byte 0xd6)
-          rom.add(fromHex[byte](piece[2][1..^1]))
+          rom.add(extractByte(piece[2]))
           inc pc
         else:
           rom.add(byte 0x97)
+
     of "and":
       case piece[2].toLowerAscii()
       of "b":
@@ -181,10 +211,11 @@ proc assemble*(code: string): seq[byte] =
       else:
         if piece[2].startsWith("$"):
           rom.add(byte 0xe6)
-          rom.add(fromHex[byte](piece[2][1..^1]))
+          rom.add(extractByte(piece[2]))
           inc pc
         else:
           rom.add(byte 0xa7)
+
     of "xor":
       case piece[2].toLowerAscii()
       of "b":
@@ -206,10 +237,11 @@ proc assemble*(code: string): seq[byte] =
       else:
         if piece[2].startsWith("$"):
           rom.add(byte 0xee)
-          rom.add(fromHex[byte](piece[2][1..^1]))
+          rom.add(extractByte(piece[2]))
           inc pc
         else:
           rom.add(byte 0xaf)
+
     of "or":
       case piece[2].toLowerAscii()
       of "b":
@@ -231,10 +263,12 @@ proc assemble*(code: string): seq[byte] =
       else:
         if piece[2].startsWith("$"):
           rom.add(byte 0xf6)
-          rom.add(fromHex[byte](piece[2][1..^1]))
+          rom.add(extractByte(piece[2]))
           inc pc
         else:
           rom.add(byte 0xb7)
+
+    # Compare
     of "cp":
       case piece[2].toLowerAscii()
       of "b":
@@ -256,41 +290,51 @@ proc assemble*(code: string): seq[byte] =
       else:
         if piece[2].startsWith("$"):
           rom.add(byte 0xfe)
-          rom.add(fromHex[byte](piece[2][1..^1]))
+          rom.add(extractByte(piece[2]))
           inc pc
         else:
           rom.add(byte 0xbf)
+
     of "jp":
       var operand_pos = 1
       case piece[1].toLowerAscii()
+      # Not Zero
       of "nz":
         rom.add(byte 0xc2)
         operand_pos += 1
+      # Zero
       of "z":
         rom.add(byte 0xca)
         operand_pos += 1
+      # Not Carry
       of "nc":
         rom.add(byte 0xd2)
         operand_pos += 1
+      # Carry
       of "c":
         rom.add(byte 0xda)
         operand_pos += 1
       else:
         rom.add(byte 0xc3)
+      # Immediate Address
       if piece[operand_pos].toLowerAscii().startsWith("$"):
-        rom.add(fromHex[byte](piece[1][1..2]))
-        rom.add(fromHex[byte](piece[1][3..4]))
+        let bytes: array[2, byte] = extract2Bytes(piece[1])
+        rom.add(bytes[0])
+        rom.add(bytes[1])
+      # Label
       elif piece[operand_pos].toLowerAscii().startsWith("&"):
         rom.add(byte 0x00)
         rom.add(byte 0x00)
         jp_list[pc] = piece[operand_pos][1..^1]
         inc pc
         inc pc
+    # Labels
     else:
       if piece[0].endsWith(":"):
         jp_labels[piece[0][0..^2]] = pc
         dec pc
     inc pc
+  # Insert Labels
   for key, val in jp_list:
     if val in jp_labels:
       let loc: int = jp_labels[val]

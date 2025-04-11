@@ -3,3 +3,4 @@ lasm
 *.exe
 /rom
 *.zip
+*.bin

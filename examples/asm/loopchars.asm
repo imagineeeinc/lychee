@@ -5,7 +5,7 @@ ld a $07 # save color
 ld b a
 jp &color
 increment:
-inc (hl) # incrment char
+inc (hl) # increment char
 jp Z &color # if all chars done then jump to color
 jp &increment # else loop
 color:
