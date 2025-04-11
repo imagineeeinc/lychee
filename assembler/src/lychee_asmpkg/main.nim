@@ -148,8 +148,5 @@ proc assemble*(code: string): seq[byte] =
         rom[key+2] = byte ((loc shr 8) and 0xFF)
       else:
         rom[key+2] = byte loc
-  
-  for i in rom:
-    echo i.toHex
 
   result = rom
