@@ -186,7 +186,11 @@ proc lycheeUpdate(emu: LycheeEmulator) =
 # main
 when isMainModule:
   # lychee loading
-  let romContent = readRomFile("./rom")
+  var romContent: seq[string]
+  if args["<rom>"]:
+    romContent = readRomFile($args["<rom>"])
+  else:
+    romContent = readRomFile("./rom")
   var emu = initLycheeEmulator()
   emu.loadRom(romContent)
 
