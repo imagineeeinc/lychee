@@ -1,6 +1,6 @@
-nimble build --d:release
+nimble build --threading:on --d:release -y
 cd assembler
-nimble build --d:release
+nimble build --d:release -y
 cd ..
 $compress = @{
   Path = "./lychee.exe", "assembler/lasm.exe", "docs", "examples", "README.md", "lychee.png"
