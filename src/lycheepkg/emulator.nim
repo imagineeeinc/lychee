@@ -62,72 +62,106 @@ proc cycle*(self: LycheeEmulator): int =
   of 0x03:
     case lsn
     of 0x0E:
-      # LD a, d8
+      # ld a, d8
       self.r.a = fromHex[byte](program[pc+1])
       inc self.r.pc
     else:
       discard
   of 0x04:
     case lsn
-    of 0x00:
+    of 0x00:# ld b, b
       self.r.b = self.r.b
-    of 0x01:
+    of 0x01:# ld b, c
       self.r.b = self.r.c
-    of 0x02:
+    of 0x02:# ld b, d
       self.r.b = self.r.d
-    of 0x03:
+    of 0x03:# ld b, e
       self.r.b = self.r.e
-    of 0x04:
+    of 0x04:# ld b, h
       self.r.b = self.r.h
-    of 0x05:
+    of 0x05:# ld b, l
       self.r.b = self.r.l
-    of 0x06:
-      # TODO: Fetch from work ram
-      # self.r.b = fromHex[int](self.r.h.toHex & self.r.l.toHex)
-      discard
-    of 0x07:
+    of 0x06:# ld b, (hl)
+      let loc = fromHex[int](toHex(parseHexInt(self.r.h.toHex & self.r.l.toHex) - 0xA800))
+      self.r.b = self.workram[loc]
+    of 0x07:# ld b, a
       self.r.b = self.r.a
-    of 0x08:
+    of 0x08:# ld c, b
       self.r.c = self.r.b
-    of 0x09:
+    of 0x09:# ld c, c
       self.r.c = self.r.c
-    of 0x0A:
+    of 0x0A:# ld c, d
       self.r.c = self.r.d
-    of 0x0B:
+    of 0x0B:# ld c, e
       self.r.c = self.r.e
-    of 0x0C:
+    of 0x0C:# ld c, h
       self.r.c = self.r.h
-    of 0x0D:
+    of 0x0D:# ld c, l
       self.r.c = self.r.l
+    of 0x0E:# ld c, (hl)
+      let loc = fromHex[int](toHex(parseHexInt(self.r.h.toHex & self.r.l.toHex) - 0xA800))
+      self.r.c = self.workram[loc]
+    of 0x0F:# ld c, a
+      self.r.c = self.r.a
+    else:
+      discard
+    # TODO: Add rest of the ld instructions
+  of 0x08:
+    case lsn
+    of 0x00: # add a, b
+      self.r.a += self.r.b
+    of 0x01: # add a, c
+      self.r.a += self.r.c
+    of 0x02: # add a, d
+      self.r.a += self.r.d
+    of 0x03: # add a, e
+      self.r.a += self.r.e
+    of 0x04: # add a, h
+      self.r.a += self.r.h
+    of 0x05: # add a, l
+      self.r.a += self.r.l
+    of 0x06: # add a, (hl)
+      let loc = fromHex[int](toHex(parseHexInt(self.r.h.toHex & self.r.l.toHex) - 0xA800))
+      self.r.a += self.workram[loc]
+    of 0x07: # add a, a
+      self.r.a += self.r.a
+    of 0x08:
+      discard
+    of 0x09:
+      discard
+    of 0x0A:
+      discard
+    of 0x0B:
+      discard
+    of 0x0C:
+      discard
+    of 0x0D:
+      discard
     of 0x0E:
-      # TODO: Fetch from work ram
-      # self.r.b = fromHex[int](self.r.h.toHex & self.r.l.toHex)
       discard
     of 0x0F:
-      self.r.c = self.r.a
+      discard
     else:
       discard
   of 0x09:
     case lsn
-    # sub R
     of 0x00: # sub b
-      self.r.a = self.r.a - self.r.b
+      self.r.a -= self.r.b
     of 0x01: # sub c
-      self.r.a = self.r.a - self.r.c
+      self.r.a -= self.r.c
     of 0x02: # sub d
-      self.r.a = self.r.a - self.r.d
+      self.r.a -= self.r.d
     of 0x03: # sub e
-      self.r.a = self.r.a - self.r.e
+      self.r.a -= self.r.e
     of 0x04: # sub h
-      self.r.a = self.r.a - self.r.h
+      self.r.a -= self.r.h
     of 0x05: # sub l
-      self.r.a = self.r.a - self.r.l
+      self.r.a -= self.r.l
     of 0x06: # sub (hl)
-      # TODO: Fetch from work ram and sub
-      # self.r.a = fromHex[int](self.r.h.toHex & self.r.l.toHex)
-      discard
+      let loc = fromHex[int](toHex(parseHexInt(self.r.h.toHex & self.r.l.toHex) - 0xA800))
+      self.r.a -= self.workram[loc]
     of 0x07: # sub a
-      self.r.a = self.r.a -  self.r.a
+      self.r.a -=  self.r.a
     of 0x08:
       discard
     of 0x09:
@@ -154,18 +188,18 @@ proc cycle*(self: LycheeEmulator): int =
       discard
   of 0x0E:
     case lsn
-    of 0x0A:# ld a16, A
-      # TODO: Fetch from work ram and sub
-      # self.r.a = fromHex[int](self.r.h.toHex & self.r.l.toHex)
-      discard
+    of 0x0A:# ld a16, a
+      let loc = fromHex[int](toHex(parseHexInt(program[pc+1] & program[pc+2]) - 0xA800))
+      self.workram[loc] = self.r.a
+      inc(self.r.pc, 2)
     else:
       discard
   of 0x0F:
     case lsn
-    of 0x0A:# ld A, a16
-      # TODO: Fetch from work ram and sub
-      # self.r.a = fromHex[int](self.r.h.toHex & self.r.l.toHex)
-      discard
+    of 0x0A:# ld a, a16
+      let loc = fromHex[int](toHex(parseHexInt(program[pc+1] & program[pc+2]) - 0xA800))
+      self.r.a = self.workram[loc]
+      inc(self.r.pc, 2)
     else:
       discard
   else:
