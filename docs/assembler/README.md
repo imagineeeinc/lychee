@@ -63,4 +63,4 @@ Lychee assembly uses specialised symbols to to denote data types.
 Sections are placed before a piece of code and is useful for the jump instruction, define a section by adding tag name followed by a `:`. Anything below that tag will be ran. Do not if you don't move to somewhere else, the CPU will just move to the next section. And this can be used strategically by placing sections next to each other for a planned behaviour.
 
 ### Opcodes
-To learn more about the avalible opcodes read [`/spec/opcode`](../spec/opcode.md). If you want to learn more about how some of the opcodes work, there is no documentation on it as od right now, however you can read about how some of them work on the [rgbds cpu refrence](https://rgbds.gbdev.io/docs/v0.7.0/gbz80.7), as the instruction set is similar to the gameboy.
+To learn more about the available opcodes read [`/spec/opcode`](../spec/opcode.md). If you want to learn more about how some of the opcodes work, there is no documentation on it as of right now, however you can read about how some of them work on the [rgbds cpu reference](https://rgbds.gbdev.io/docs/v0.7.0/gbz80.7), as the instruction set is similar to the Gameboy.

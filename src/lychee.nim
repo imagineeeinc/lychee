@@ -167,6 +167,8 @@ proc lycheeUpdate(emu: LycheeEmulator) =
   of Key.N:
     if paused:
       runUpdate(emu)
+  of Key.CtrlB:
+    writeFile($args["<rom>"] & "-" & "dump.bin", emu.mem_dump())
 
   else:
     discard
@@ -190,7 +192,8 @@ when isMainModule:
   if args["<rom>"]:
     romContent = readRomFile($args["<rom>"])
   else:
-    romContent = readRomFile("./rom")
+    echo "Provide rom file"
+    quit(1)
   var emu = initLycheeEmulator()
   emu.loadRom(romContent)
 
