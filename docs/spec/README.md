@@ -15,7 +15,7 @@ To read the full specification as a list read the [`specs` document](spec.md)
 		- [Instruction set](#instruction-set)
 			- [Assembly](#assembly)
 	- [Memory](#memory)
-			- [Character display memory](#character-display-memory)
+		- [Character display memory](#character-display-memory)
 	- [Audio](#audio)
 	- [Input](#input)
 
@@ -91,7 +91,7 @@ Lychee uses a 16 bit address bus, thus 65536 possible address locations. This is
 4. ($9781-$9999) 536 bytes: Reserved stack ram
 5. ($A000 - $FFFF) 24 kb: Work RAM
 
-#### Character display memory
+### Character display memory
 Between `$8001`-`$9680` is where all the character data is stored. For each address that stores the character, the adjacent memory address is the character's colour data.
 
 As the address goes up we move along the from left to right, once we reach the end of a line we loop back to the left of the next line.
