@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Install Nim
         uses: iffy/install-nim@v5
@@ -43,7 +43,7 @@ jobs:
 
       - name: Upload Build Artifact
         if: steps.check_commits.outputs.commits_present == 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lychee-build-windows
           path: lychee-build-win.zip
