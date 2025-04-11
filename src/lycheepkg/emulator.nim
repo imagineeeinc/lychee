@@ -69,6 +69,8 @@ proc cycle*(self: LycheeEmulator): int =
 
   inc self.r.pc
 
+  self.f.z = false
+
   # Constants
   let hl = fromHex[int](toHex(parseHexInt(self.r.h.toHex & self.r.l.toHex) - mem_offset))
   let a16 = fromHex[int](toHex(parseHexInt(program[pc+1] & program[pc+2]) - mem_offset))
@@ -84,12 +86,20 @@ proc cycle*(self: LycheeEmulator): int =
     case lsn
     of 0x04:# inc (hl)
       inc self.workram[hl]
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x05:# dec (hl)
       dec self.workram[hl]
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x0C:# inc a
       inc self.r.a
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x0D:# dec a
       dec self.r.a
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x0E:# ld a, d8
       self.r.a = fromHex[byte](program[pc+1])
       inc self.r.pc
@@ -243,20 +253,36 @@ proc cycle*(self: LycheeEmulator): int =
     case lsn
     of 0x00: # add a, b
       self.r.a += self.r.b
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x01: # add a, c
       self.r.a += self.r.c
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x02: # add a, d
       self.r.a += self.r.d
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x03: # add a, e
       self.r.a += self.r.e
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x04: # add a, h
       self.r.a += self.r.h
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x05: # add a, l
       self.r.a += self.r.l
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x06: # add a, (hl)
       self.r.a += self.workram[hl]
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x07: # add a, a
       self.r.a += self.r.a
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x08:
       discard
     of 0x09:
@@ -279,20 +305,36 @@ proc cycle*(self: LycheeEmulator): int =
     case lsn
     of 0x00: # sub b
       self.r.a -= self.r.b
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x01: # sub c
       self.r.a -= self.r.c
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x02: # sub d
       self.r.a -= self.r.d
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x03: # sub e
       self.r.a -= self.r.e
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x04: # sub h
       self.r.a -= self.r.h
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x05: # sub l
       self.r.a -= self.r.l
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x06: # sub (hl)
       self.r.a -= self.workram[hl]
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x07: # sub a
       self.r.a -=  self.r.a
+      if self.r.a == 0x00:
+        self.f.z = true
     of 0x08:
       discard
     of 0x09:
@@ -317,6 +359,8 @@ proc cycle*(self: LycheeEmulator): int =
       self.r.pc = fromHex[int](program[pc+1] & program[pc+2])
     of 0x06:# add a, d8
       self.r.a += fromHex[byte](program[pc+1])
+      if self.r.a == 0x00:
+        self.f.z = true
       inc self.r.pc
     else:
       discard
@@ -324,6 +368,8 @@ proc cycle*(self: LycheeEmulator): int =
     case lsn
     of 0x06: # sub a, d8
       self.r.a -= fromHex[byte](program[pc+1])
+      if self.r.a == 0x00:
+        self.f.z = true
       inc self.r.pc
     else:
       discard

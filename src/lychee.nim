@@ -38,15 +38,15 @@ proc cleanup() {.cdecl.} =
   illwillDeinit()
   showCursor()
 
-proc printFont(fontIndex: int32, title: cstring, r: uint8, g: uint8, b: uint8) =
-  sdtx.font(fontIndex)
-  sdtx.color3b(r, g, b)
-  sdtx.puts(title)
-  for c in 32..<256:
-    sdtx.putc(c.char)
-    if 0 == ((c + 1) and 63):
-      sdtx.crlf()
-  sdtx.crlf()
+# proc printFont(fontIndex: int32, title: cstring, r: uint8, g: uint8, b: uint8) =
+#   sdtx.font(fontIndex)
+#   sdtx.color3b(r, g, b)
+#   sdtx.puts(title)
+#   for c in 32..<256:
+#     sdtx.putc(c.char)
+#     if 0 == ((c + 1) and 63):
+#       sdtx.crlf()
+#   sdtx.crlf()
 
 # illwill setup
 proc exitProc() {.noconv.} =
@@ -64,6 +64,7 @@ tb.setForegroundColor(fgBlack, true)
 tb.drawRect(0, 0, 11, 9)
 tb.drawHorizLine(2, 9, 7, doubleStyle=true)
 tb.drawRect(12, 0, 12+11, 9)
+tb.drawHorizLine(14, 21, 2, doubleStyle=true)
 
 # lychee setup
 const color_table = [
@@ -146,6 +147,7 @@ proc lycheeUpdate(emu: LycheeEmulator) =
   tb.write(2, 5, resetStyle, "PC: ", fgGreen, toHex(emu.r.pc, 4))
   tb.write(2, 6, resetStyle, "SP: ", fgGreen, toHex(emu.r.sp, 4))
   tb.write(2, 8, resetStyle, "MBR: ", fgGreen, emu.program[emu.r.pc])
+  tb.write(13, 3, resetStyle, "Z: ", fgGreen, if emu.f.z: "1" else: "0")
 
   tb.display()
 
