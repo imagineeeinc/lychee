@@ -2,11 +2,11 @@
 
 version       = "0.1.0"
 author        = "imagineeeinc"
-description   = "An operand emulator"
+description   = "An assembly emulator"
 license       = "MIT"
 srcDir        = "src"
 installExt    = @["nim"]
-bin           = @["lychee"]
+namedBin      = {"lychee": "lychee", "cli": "lychee-cli"}.toTable()
 
 
 # Dependencies

@@ -1,10 +1,10 @@
 let doc = """
-Lychee Desktop Emulator
+Lychee Terminal Emulator
 
 Usage:
-  lychee <rom>
-  lychee <rom> -d
-  lychee <rom> --paused
+  lychee-cli <rom>
+  lychee-cli <rom> -d
+  lychee-cli <rom> --paused
 
 Options:
   -h --help     Show this screen.
@@ -18,57 +18,13 @@ import std/[strutils, monotimes, times]
 import illwill
 import docopt
 
-import sokol/log as slog
-import sokol/gfx as sg
-import sokol/app as sapp
-import sokol/debugtext as sdtx
-import sokol/glue as sglue
-
 import lycheepkg/emulator
 import fileLoading
 
-const platform = "Desktop"
+const platform = "Terminal"
 const NimblePkgVersion {.strdefine.} = ""
 
 let args = docopt(doc, version = "Lychee Emulator $1 $2" % [platform, NimblePkgVersion])
-
-# sokol setup
-const passAction = PassAction(
-    colors: [
-      ColorAttachmentAction(loadAction: loadActionClear, clearValue: (0, 0, 0, 1))
-    ]
-  )
-
-proc init() {.cdecl.} =
-  sg.setup(sg.Desc(
-    environment: sglue.environment(),
-    logger: sg.Logger(fn: slog.fn),
-  ))
-
-  # setup sokol/debugtext
-  sdtx.setup(sdtx.Desc(
-    fonts: [
-      sdtx.fontC64()
-    ],
-    logger: sdtx.Logger(fn: slog.fn),
-  ))
-
-proc cleanup() {.cdecl.} =
-  sdtx.shutdown()
-  sg.shutdown()
-  illwillDeinit()
-  showCursor()
-  quit(0)
-
-# proc printFont(fontIndex: int32, title: cstring, r: uint8, g: uint8, b: uint8) =
-#   sdtx.font(fontIndex)
-#   sdtx.color3b(r, g, b)
-#   sdtx.puts(title)
-#   for c in 32..<256:
-#     sdtx.putc(c.char)
-#     if 0 == ((c + 1) and 63):
-#       sdtx.crlf()
-#   sdtx.crlf()
 
 # illwill setup
 proc exitProc() {.noconv.} =
@@ -119,7 +75,6 @@ var clocklast = getMonoTime()
 var paused: bool = if args["--paused"]: true else: false
 
 proc lycheeDraw(emu: LycheeEmulator) =
-  sdtx.font(0)
   for y in 0..44:
     for x in 0..63:
       let pos = (x + y*63)*2
@@ -130,14 +85,16 @@ proc lycheeDraw(emu: LycheeEmulator) =
       # Least significant nibble
       let lsn = color and 0x0f
       let foreground = color_table[lsn]
-      sdtx.color3b(uint8 foreground[0], uint8 foreground[1], uint8 foreground[2])
       if c >= 32:
-        sdtx.putc(c.char)
-    sdtx.crlf()
+        # Set colour to foreground and background to background
+        # draw charecter
+        discard
 
 proc runUpdate(emu: LycheeEmulator) =
   let cur = getMonoTime()
   if cur - sixtylast > sixtyhz:
+    # Display
+    lycheeDraw(emu)
     # timers
     if emu.r.timer != 0:
       dec emu.r.timer
@@ -199,39 +156,16 @@ when isMainModule:
   var emu = initLycheeEmulator()
   emu.loadRom(romContent)
 
-  # update func
-  proc frame() {.cdecl.} =
-    # set virtual canvas size to half display size so that
-    # glyphs are 16x16 display pixels
-    sdtx.canvas(sapp.widthf()*0.5, sapp.heightf()*0.5)
-    sdtx.origin(0, 0)
-    sdtx.home()
-    lycheeDraw(emu)
-
-    sg.beginPass(Pass(action: passAction, swapchain: sglue.swapchain()))
-    sdtx.draw()
-    sg.endPass()
-    sg.commit()
-
-    lycheeUpdate(emu)
-  var t: Thread[tuple[emu: ptr LycheeEmulator, paused: ptr bool]]
+  #[ var t: Thread[tuple[emu: ptr LycheeEmulator, paused: ptr bool]]
   proc looping(parms: tuple[emu: ptr LycheeEmulator, paused: ptr bool]) {.thread.} =
     while true:
       if parms.paused[] == false:
-        runUpdate(parms.emu[])
+        
   createThread(t, looping, (addr emu, addr paused))
   
-
-  sapp.run(sapp.Desc(
-    initCb: init,
-    frameCb: frame,
-    cleanupCb: cleanup,
-    enable_dragndrop: true,
-    fullscreen: false,
-    width: int32 16*64,
-    height: int32 16*45,
-    windowTitle: "lychee",
-    icon: IconDesc(sokol_default: true),
-    logger: sapp.Logger(fn: slog.fn),
-  ))
-  joinThread(t)
+  joinThread(t) ]#
+  
+  while true:
+    if paused == false:
+      runUpdate(emu)
+    lycheeUpdate(emu)
