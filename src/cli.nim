@@ -1,16 +1,16 @@
 let doc = """
-Lychee Terminal Emulator
+Lychee Emulator
 
 Usage:
-  lychee-cli <rom>
-  lychee-cli <rom> -d
-  lychee-cli <rom> --paused
+  lychee <rom>
+  lychee <rom> -d
+  lychee <rom> (--paused | -p)
 
 Options:
-  -h --help     Show this screen.
-  --version     Show version.
-  -d            Launch in debug mode, which runs at 1Hz.
-  --paused      Launch paused, good for steping instruction by instruction.
+  -h --help             Show this screen.
+  --version             Show version.
+  -d                    Launch in debug mode, which runs at 1Hz.
+  --paused -p           Launch paused, good for steping instruction by instruction.
 """
 
 import std/[strutils, monotimes, times]
@@ -21,7 +21,7 @@ import docopt
 import lycheepkg/emulator
 import fileLoading
 
-const platform = "Terminal"
+const platform = "CLI"
 const NimblePkgVersion {.strdefine.} = ""
 
 let args = docopt(doc, version = "Lychee Emulator $1 $2" % [platform, NimblePkgVersion])
@@ -86,20 +86,16 @@ proc lycheeDraw(emu: LycheeEmulator) =
       let lsn = color and 0x0f
       let foreground = color_table[lsn]
       if c >= 32:
-        # Set colour to foreground and background to background
-        # draw charecter
-        discard
+        tb.write(x, y, resetStyle, $c.char)
 
 proc runUpdate(emu: LycheeEmulator) =
   let cur = getMonoTime()
   if cur - sixtylast > sixtyhz:
-    # Display
-    lycheeDraw(emu)
     # timers
     if emu.r.timer != 0:
       dec emu.r.timer
     sixtylast = getMonoTime()
-  if cur - clocklast > clockhz:
+  if cur - clocklast > clockhz or (debug and paused):
     let exit_code = emu.cycle()
     if exit_code == 1:
       # TODO: Make a clean exit
@@ -115,14 +111,14 @@ proc lycheeUpdate(emu: LycheeEmulator) =
     if debug == false:
       debug = true
       clockhz = debugclockhz
-      tb.write(13, 1, resetStyle, "Debug: ", fgGreen, "On ")
+      # tb.write(13, 1, resetStyle, "Debug: ", fgGreen, "On ")
     else:
       debug = false
       clockhz = defaultclockhz
-      tb.write(13, 1, resetStyle, "Debug: ", fgRed, "Off")
+      # tb.write(13, 1, resetStyle, "Debug: ", fgRed, "Off")
   of Key.Space:
     paused = not paused
-    tb.write(13, 2, resetStyle, "Paused:", if paused: fgGreen else: fgRed, if paused: "On " else: "Off")
+    # tb.write(13, 2, resetStyle, "Paused:", if paused: fgGreen else: fgRed, if paused: "On " else: "Off")
   of Key.N:
     if paused:
       runUpdate(emu)
@@ -131,7 +127,7 @@ proc lycheeUpdate(emu: LycheeEmulator) =
 
   else:
     discard
-  tb.write(2, 1, resetStyle, "A: ", fgGreen, emu.r.a.toHex)
+  #[ tb.write(2, 1, resetStyle, "A: ", fgGreen, emu.r.a.toHex)
   tb.write(2, 2, resetStyle, "BC: ", fgGreen, emu.r.b.toHex, emu.r.c.toHex)
   tb.write(2, 3, resetStyle, "DE: ", fgGreen, emu.r.d.toHex, emu.r.e.toHex)
   tb.write(2, 4, resetStyle, "HL: ", fgGreen, emu.r.h.toHex, emu.r.l.toHex)
@@ -142,7 +138,7 @@ proc lycheeUpdate(emu: LycheeEmulator) =
   tb.write(13, 5, resetStyle, "C: ", fgGreen, toHex(emu.f.c, 2))
   tb.write(13, 6, resetStyle, "Timer: ", fgGreen, toHex(emu.r.timer, 2))
 
-  tb.display()
+  tb.display() ]#
 
 # main
 when isMainModule:
@@ -155,17 +151,18 @@ when isMainModule:
     quit(1)
   var emu = initLycheeEmulator()
   emu.loadRom(romContent)
-
-  #[ var t: Thread[tuple[emu: ptr LycheeEmulator, paused: ptr bool]]
-  proc looping(parms: tuple[emu: ptr LycheeEmulator, paused: ptr bool]) {.thread.} =
+  if terminalWidth() < 64 or terminalHeight() < 45:
+    echo "Your terminal is $1x$2" % [$terminalWidth(), $terminalHeight()]
+    echo "Terminal too small, need at least 64x45"
+    quit(1)
+  else:
+    var displaylast = getMonoTime()
     while true:
-      if parms.paused[] == false:
-        
-  createThread(t, looping, (addr emu, addr paused))
-  
-  joinThread(t) ]#
-  
-  while true:
-    if paused == false:
-      runUpdate(emu)
-    lycheeUpdate(emu)
+      if getMonoTime() - displaylast > sixtyhz:
+        displaylast = getMonoTime()
+        tb.clear()
+        lycheeDraw(emu)
+        tb.display()
+        lycheeUpdate(emu)
+      if paused == false:
+        runUpdate(emu)

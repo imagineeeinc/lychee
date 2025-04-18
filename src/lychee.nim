@@ -12,7 +12,7 @@ Options:
   --version             Show version.
   -d                    Launch in debug mode, which runs at 1Hz.
   --paused -p           Launch paused, good for steping instruction by instruction.
-  --no-gui --terminal   Launch in terminal mode
+  --no-gui --terminal   Launch in terminal mode (Not working as of now)
 """
 
 import std/[strutils, monotimes, times]
@@ -112,8 +112,7 @@ var clocklast = getMonoTime()
 var paused: bool = if args["--paused"]: true else: false
 
 proc lycheeDraw(emu: LycheeEmulator) =
-  if not terminalMode:
-    sdtx.font(0)
+  sdtx.font(0)
   for y in 0..44:
     for x in 0..63:
       let pos = (x + y*63)*2
@@ -125,13 +124,9 @@ proc lycheeDraw(emu: LycheeEmulator) =
       let lsn = color and 0x0f
       let foreground = color_table[lsn]
       if c >= 32:
-        if not terminalMode:
-          sdtx.color3b(uint8 foreground[0], uint8 foreground[1], uint8 foreground[2])
-          sdtx.putc(c.char)
-        else:
-          tb.write(x, y, resetStyle, $c.char)
-    if not terminalMode:
-      sdtx.crlf()
+        sdtx.color3b(uint8 foreground[0], uint8 foreground[1], uint8 foreground[2])
+        sdtx.putc(c.char)
+    sdtx.crlf()
 
 proc runUpdate(emu: LycheeEmulator) =
   let cur = getMonoTime()
@@ -156,17 +151,14 @@ proc lycheeUpdate(emu: LycheeEmulator) =
     if debug == false:
       debug = true
       clockhz = debugclockhz
-      if not terminalMode:
-        tb.write(13, 1, resetStyle, "Debug: ", fgGreen, "On ")
+      tb.write(13, 1, resetStyle, "Debug: ", fgGreen, "On ")
     else:
       debug = false
       clockhz = defaultclockhz
-      if not terminalMode:
-        tb.write(13, 1, resetStyle, "Debug: ", fgRed, "Off")
+      tb.write(13, 1, resetStyle, "Debug: ", fgRed, "Off")
   of Key.Space:
     paused = not paused
-    if not terminalMode:
-      tb.write(13, 2, resetStyle, "Paused:", if paused: fgGreen else: fgRed, if paused: "On " else: "Off")
+    tb.write(13, 2, resetStyle, "Paused:", if paused: fgGreen else: fgRed, if paused: "On " else: "Off")
   of Key.N:
     if paused:
       runUpdate(emu)
@@ -175,19 +167,18 @@ proc lycheeUpdate(emu: LycheeEmulator) =
 
   else:
     discard
-  if not terminalMode:
-    tb.write(2, 1, resetStyle, "A: ", fgGreen, emu.r.a.toHex)
-    tb.write(2, 2, resetStyle, "BC: ", fgGreen, emu.r.b.toHex, emu.r.c.toHex)
-    tb.write(2, 3, resetStyle, "DE: ", fgGreen, emu.r.d.toHex, emu.r.e.toHex)
-    tb.write(2, 4, resetStyle, "HL: ", fgGreen, emu.r.h.toHex, emu.r.l.toHex)
-    tb.write(2, 5, resetStyle, "PC: ", fgGreen, toHex(emu.r.pc, 4))
-    tb.write(2, 6, resetStyle, "SP: ", fgGreen, toHex(emu.r.sp, 4))
-    tb.write(2, 8, resetStyle, "MBR: ", fgGreen, emu.ram[emu.r.pc].toHex)
-    tb.write(13, 4, resetStyle, "Z: ", fgGreen, if emu.f.z: "1" else: "0")
-    tb.write(13, 5, resetStyle, "C: ", fgGreen, toHex(emu.f.c, 2))
-    tb.write(13, 6, resetStyle, "Timer: ", fgGreen, toHex(emu.r.timer, 2))
+  tb.write(2, 1, resetStyle, "A: ", fgGreen, emu.r.a.toHex)
+  tb.write(2, 2, resetStyle, "BC: ", fgGreen, emu.r.b.toHex, emu.r.c.toHex)
+  tb.write(2, 3, resetStyle, "DE: ", fgGreen, emu.r.d.toHex, emu.r.e.toHex)
+  tb.write(2, 4, resetStyle, "HL: ", fgGreen, emu.r.h.toHex, emu.r.l.toHex)
+  tb.write(2, 5, resetStyle, "PC: ", fgGreen, toHex(emu.r.pc, 4))
+  tb.write(2, 6, resetStyle, "SP: ", fgGreen, toHex(emu.r.sp, 4))
+  tb.write(2, 8, resetStyle, "MBR: ", fgGreen, emu.ram[emu.r.pc].toHex)
+  tb.write(13, 4, resetStyle, "Z: ", fgGreen, if emu.f.z: "1" else: "0")
+  tb.write(13, 5, resetStyle, "C: ", fgGreen, toHex(emu.f.c, 2))
+  tb.write(13, 6, resetStyle, "Timer: ", fgGreen, toHex(emu.r.timer, 2))
 
-    tb.display()
+  tb.display()
 
 # main
 when isMainModule:
@@ -200,44 +191,44 @@ when isMainModule:
     quit(1)
   var emu = initLycheeEmulator()
   emu.loadRom(romContent)
-  if not terminalMode:
+  # if not terminalMode:
     # update func
-    proc frame() {.cdecl.} =
-      # set virtual canvas size to half display size so that
-      # glyphs are 16x16 display pixels
-      sdtx.canvas(sapp.widthf()*0.5, sapp.heightf()*0.5)
-      sdtx.origin(0, 0)
-      sdtx.home()
-      lycheeDraw(emu)
+  proc frame() {.cdecl.} =
+    # set virtual canvas size to half display size so that
+    # glyphs are 16x16 display pixels
+    sdtx.canvas(sapp.widthf()*0.5, sapp.heightf()*0.5)
+    sdtx.origin(0, 0)
+    sdtx.home()
+    lycheeDraw(emu)
 
-      sg.beginPass(Pass(action: passAction, swapchain: sglue.swapchain()))
-      sdtx.draw()
-      sg.endPass()
-      sg.commit()
+    sg.beginPass(Pass(action: passAction, swapchain: sglue.swapchain()))
+    sdtx.draw()
+    sg.endPass()
+    sg.commit()
 
-      lycheeUpdate(emu)
-    var t: Thread[tuple[emu: ptr LycheeEmulator, paused: ptr bool]]
-    proc looping(parms: tuple[emu: ptr LycheeEmulator, paused: ptr bool]) {.thread.} =
-      while true:
-        if parms.paused[] == false:
-          runUpdate(parms.emu[])
-    createThread(t, looping, (addr emu, addr paused))
-    
+    lycheeUpdate(emu)
+  var t: Thread[tuple[emu: ptr LycheeEmulator, paused: ptr bool]]
+  proc looping(parms: tuple[emu: ptr LycheeEmulator, paused: ptr bool]) {.thread.} =
+    while true:
+      if parms.paused[] == false:
+        runUpdate(parms.emu[])
+  createThread(t, looping, (addr emu, addr paused))
+  
 
-    sapp.run(sapp.Desc(
-      initCb: init,
-      frameCb: frame,
-      cleanupCb: cleanup,
-      enable_dragndrop: true,
-      fullscreen: false,
-      width: int32 16*64,
-      height: int32 16*45,
-      windowTitle: "lychee",
-      icon: IconDesc(sokol_default: true),
-      logger: sapp.Logger(fn: slog.fn),
-    ))
-    joinThread(t)
-  else:
+  sapp.run(sapp.Desc(
+    initCb: init,
+    frameCb: frame,
+    cleanupCb: cleanup,
+    enable_dragndrop: true,
+    fullscreen: false,
+    width: int32 16*64,
+    height: int32 16*45,
+    windowTitle: "lychee",
+    icon: IconDesc(sokol_default: true),
+    logger: sapp.Logger(fn: slog.fn),
+  ))
+  joinThread(t)
+  #[ else:
     if terminalWidth() < 64 or terminalHeight() < 45:
       echo "Your terminal is $1x$2" % [$terminalWidth(), $terminalHeight()]
       echo "Terminal too small, need at least 64x45"
@@ -252,4 +243,4 @@ when isMainModule:
           tb.display()
           lycheeUpdate(emu)
         if paused == false:
-          runUpdate(emu)
+          runUpdate(emu) ]#
