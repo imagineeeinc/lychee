@@ -1,3 +1,4 @@
+
 name: Deploy Nightly
 on:
   schedule:
@@ -22,9 +23,9 @@ jobs:
         with:
           version: binary:2.0.2
 
-      - if: matrix.os == windows-latest
-        name: Check for commits today
-        id: check_commits
+      - if: matrix.os == 'windows-latest'
+        name: Check for commits today (win)
+        id: check_commits_win
         shell: pwsh
         run: |
           # Get the current date in YYYY-MM-DD format
@@ -39,9 +40,9 @@ jobs:
           } else {
             echo "::set-output name=commits_present::true"
           }
-      - if: matrix.os == ubuntu-latest
-        name: Check for commits today
-        id: check_commits
+      - if: matrix.os == 'ubuntu-latest'
+        name: Check for commits today (linux)
+        id: check_commits_linux
         shell: bash
         run: |
           # Get the current date in YYYY-MM-DD format
@@ -57,30 +58,31 @@ jobs:
             echo "::set-output name=commits_present::true"
           fi
 
-      - name: Run Build if Commits Present
-        if: ${{ (steps.check_commits.outputs.commits_present == 'true') && (matrix.os == windows-latest) }}
+      - name: Run Build if Commits Present (win)
+        if: steps.check_commits.outputs.commits_present == 'true' && matrix.os == 'windows-latest'
         shell: pwsh
         run: |
           echo "Commits were found for today. Running build script..."
           ./build.ps1
 
-      - name: Run Build if Commits Present
-        if: ${{ (steps.check_commits.outputs.commits_present == 'true') && (matrix.os == ubuntu-latest) }}
+      - name: Run Build if Commits Present (linux)
+        if: steps.check_commits.outputs.commits_present == 'true' && matrix.os == 'ubuntu-latest'
         shell: bash
         run: |
           echo "Commits were found for today. Running build script..."
           ./build.sh
 
-      - name: Upload Build Artifact
-        if: ${{ (steps.check_commits.outputs.commits_present == 'true') && (matrix.os == windows-latest) }}
+      - name: Upload Build Artifact (win)
+        if: steps.check_commits.outputs.commits_present == 'true' && matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: lychee-build-windows
           path: lychee-build-win.zip
 
-      - name: Upload Build Artifact
-        if: ${{ (steps.check_commits.outputs.commits_present == 'true') && (matrix.os == ubuntu-latest) }}
+      - name: Upload Build Artifact (linux)
+        if: steps.check_commits.outputs.commits_present == 'true' && matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: lychee-build-linux
           path: lychee-build-linux-x64.zip
+
