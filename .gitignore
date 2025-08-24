@@ -1,4 +1,5 @@
 lychee
+lychee-cli
 lasm
 *.exe
 /rom

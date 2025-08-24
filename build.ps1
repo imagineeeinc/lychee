@@ -3,7 +3,7 @@ cd assembler
 nimble build --d:release -y
 cd ..
 $compress = @{
-  Path = "./lychee.exe", "assembler/lasm.exe", "docs", "examples", "README.md", "lychee.png"
+  Path = "./lychee.exe", "./lychee-cli.exe", "assembler/lasm.exe", "docs", "examples", "README.md", "lychee.png"
   CompressionLevel = "Fastest"
   DestinationPath = "lychee-build-win.zip"
 }
