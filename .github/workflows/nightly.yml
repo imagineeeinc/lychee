@@ -53,9 +53,9 @@ jobs:
 
           # If there are no commits, set the output to 'false'
           if [ -z "$commits" ]; then
-            echo "::set-output name=commits_present::false"
+            echo "commits_present=false" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=commits_present::true"
+            echo "commits_present=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Run Build if Commits Present (win)
